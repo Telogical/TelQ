@@ -1,0 +1,11 @@
+{
+    "name": "TelQ",
+    "version": "0.0.1",
+
+    "dependencies": {
+        "request": "*",
+        "rsvp": "*",
+        "querystring": "*",
+        "tedious": "*"
+    }
+}
