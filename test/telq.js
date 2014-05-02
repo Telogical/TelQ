@@ -1,7 +1,10 @@
 'use strict';
 
-var sinon = require('sinon');
-var expect = require('chai').expect;
+var chai = require('chai');
+var chaiAsPromised = require('chai-as-promised');
+chai.use(chaiAsPromised);
+var expect = chai.expect;
+
 
 describe('Given I want to make an asynchronous request for a resource', function () {
 
@@ -11,7 +14,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
         var server = 'http://server';
         var resource = '/resource';
-        var result = {datum: 'some data'};
+        var result = {"datum": "some data"};
 
         beforeEach(function () {
             var nock = require('nock');
@@ -24,19 +27,9 @@ describe('Given I want to make an asynchronous request for a resource', function
                 var url = server + resource;
                 var qUrl = q.get(url, {});
 
-                qUrl.then(function(data){
-                    console.log('I have returned', data);
-                    try {
-                        expect(data).to.equal(result);
-                    } catch(err) {
-                       console.log('ERROR', err)
-                    }
-//                    expect(data).to.equal(result);
-                    console.log('after assert')
-                    done();
-                })
-
+                expect(qUrl).to.eventually.deep.equal(result).and.notify(done);
             });
+
         });
     });
 });
