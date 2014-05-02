@@ -19,9 +19,7 @@ function TelQ() {
         function qGetHttp(resolve, reject) {
 
             function requestCallback(error, response, body) {
-
                 if (!error && response.statusCode === 200) {
-
                     if (telQCachingEnabled && options.expires > 0) {
                         cache.add({
                             id: url,
@@ -29,7 +27,10 @@ function TelQ() {
                             expires: new Date(new Date().getTime() + options.expires)
                         });
                     }
-                    resolve(body, response);
+
+                    var result = typeof body ==='string' ? JSON.parse(body) : body;
+
+                    resolve(result, response);
                 } else {
                     reject(error);
                 }
@@ -41,7 +42,8 @@ function TelQ() {
                 }
             }
 
-            options.params = reOrder(options.params);
+
+            options.params = options.params ? reOrder(options.params) : null;
 
             url = (options.params) ?
                 url + '?' + qs.stringify(options.params) :
@@ -51,7 +53,7 @@ function TelQ() {
             if (telQCachingEnabled) {
                 _.each(cache.list(), returnIfCached);
             }
-            
+
             request(url, requestCallback);
         }
 
