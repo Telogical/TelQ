@@ -11,134 +11,134 @@ var cacheTime = (60 * 1000); //cache specified in minutes
 var telQCachingEnabled = true;
 
 function TelQ() {
-    'use strict';
+	'use strict';
 
-    function get(url, options) {
-        options.expires = (options.expires || 0) * cacheTime;
+	function get(url, options) {
+		options.expires = (options.expires || 0) * cacheTime;
 
-        function qGetHttp(resolve, reject) {
+		function qGetHttp(resolve, reject) {
 
-            function requestCallback(error, response, body) {
-                if (!error && response.statusCode === 200) {
-                    if (telQCachingEnabled && options.expires > 0) {
-                        cache.add({
-                            id: url,
-                            value: [body, response],
-                            expires: new Date(new Date().getTime() + options.expires)
-                        });
-                    }
+			function requestCallback(error, response, body) {
+				if (!error && response.statusCode === 200) {
+					if (telQCachingEnabled && options.expires > 0) {
+						cache.add({
+							id: url,
+							value: [body, response],
+							expires: new Date(new Date().getTime() + options.expires)
+						});
+					}
 
-                    var result = typeof body ==='string' ? JSON.parse(body) : body;
+					var result = typeof body === 'string' ? JSON.parse(body) : body;
 
-                    resolve(result, response);
-                } else {
-                    reject(error);
-                }
-            }
+					resolve(result, response);
+				} else {
+					reject(error);
+				}
+			}
 
-            function returnIfCached(cachedItem) {
-                if (cachedItem.id === url) {
-                    resolve(cachedItem.value[0], cachedItem.value[1]);
-                }
-            }
+			function returnIfCached(cachedItem) {
+				if (cachedItem.id === url) {
+					resolve(cachedItem.value[0], cachedItem.value[1]);
+				}
+			}
 
 
-            options.params = options.params ? reOrder(options.params) : null;
+			options.params = options.params ? reOrder(options.params) : null;
 
-            url = (options.params) ?
-                url + '?' + qs.stringify(options.params) :
-                url;
-            
-            //memoize short circuit.
-            if (telQCachingEnabled) {
-                _.each(cache.list(), returnIfCached);
-            }
+			url = (options.params) ?
+				url + '?' + qs.stringify(options.params) :
+				url;
 
-            request(url, requestCallback);
-        }
+			//memoize short circuit.
+			if (telQCachingEnabled) {
+				_.each(cache.list(), returnIfCached);
+			}
 
-        return new RSVP.Promise(qGetHttp);
-    }
+			request(url, requestCallback);
+		}
 
-    function post(options) {
-        function qGetHttp(resolve, reject) {
-            function requestCallback(error, response, body) {
-                if (!error && response.statusCode === 200) {
-                    resolve(body, response);
-                } else {
-                    reject(error);
-                }
-            }
-            request.post(options, requestCallback);
+		return new RSVP.Promise(qGetHttp);
+	}
 
-        }
-        return new RSVP.Promise(qGetHttp);
-    }
+	function post(options) {
+		function qGetHttp(resolve, reject) {
+			function requestCallback(error, response, body) {
+				if (!error && response.statusCode === 200) {
+					resolve(body, response);
+				} else {
+					reject(error);
+				}
+			}
+			request.post(options, requestCallback);
 
-    function dbMongoose(options) {
-        var operation = options.operation || 'find';
-        var query = options.query || {};
-        var model = options.database;
+		}
+		return new RSVP.Promise(qGetHttp);
+	}
 
-        function qGetDB(resolve, reject) {
-            if (!model) {
-                reject('no model');
-            }
+	function dbMongoose(options) {
+		var operation = options.operation || 'find';
+		var query = options.query || {};
+		var model = options.database;
 
-            function dbCallback(err, data) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            }
-            model[operation](query, dbCallback);
-        }
-        return new RSVP.Promise(qGetDB);
-    }
+		function qGetDB(resolve, reject) {
+			if (!model) {
+				reject('no model');
+			}
 
-    function dbSql(options) {
+			function dbCallback(err, data) {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(data);
+				}
+			}
+			model[operation](query, dbCallback);
+		}
+		return new RSVP.Promise(qGetDB);
+	}
 
-        function qExecuteStatement(resolve, reject) {
-            var connection = new Connection(options.sqlServer);
+	function dbSql(options) {
 
-            //            connection.on('debug', function(text) {
-            //                // If no error, then good to go...
-            //                console.log('Debug: ' + text);
-            //            });
+		function qExecuteStatement(resolve, reject) {
+			var connection = new Connection(options.sqlServer);
 
-            connection.on('connect', function (err) {
+			//            connection.on('debug', function(text) {
+			//                // If no error, then good to go...
+			//                console.log('Debug: ' + text);
+			//            });
 
-                if (err) {
-                    reject('Error connecting: ' + err);
-                }
+			connection.on('connect', function (err) {
 
-                var requestSql = new Request(options.query, function (err, rowCount) {
-                    if (err) {
-                        connection.close();
-                        reject('Error with sql execution');
-                    }
+				if (err) {
+					reject('Error connecting: ' + err);
+				}
 
-                    connection.close();
-                    resolve('Statement executed successfully');
-                });
+				var requestSql = new Request(options.query, function (err, rowCount) {
+					if (err) {
+						connection.close();
+						reject('Error with sql execution');
+					}
 
-                connection.execSql(requestSql);
-            })
-        }
+					connection.close();
+					resolve('Statement executed successfully');
+				});
 
-        return new RSVP.Promise(qExecuteStatement);
-    }
+				connection.execSql(requestSql);
+			})
+		}
 
-    var q = _.extend(this, RSVP);
+		return new RSVP.Promise(qExecuteStatement);
+	}
 
-    //RSVP.configure('onerror', function(reason){ console.assert(false,reason)}); //Error handling?
+	var q = _.extend(this, RSVP);
 
-    q.post = post;
-    q.get = get;
-    q.dbMongoose = dbMongoose;
-    q.dbSql = dbSql;
-    return q;
+	//RSVP.configure('onerror', function(reason){ console.assert(false,reason)}); //Error handling?
+
+	q.post = post;
+	q.get = get;
+	q.dbMongoose = dbMongoose;
+	q.dbSql = dbSql;
+	return q;
 }
 
 module.exports = new TelQ();

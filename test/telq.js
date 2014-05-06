@@ -16,19 +16,25 @@ describe('Given I want to make an asynchronous request for a resource', function
 		var resource = '/resource';
 
 		describe('And the resource returns without an error', function () {
-
+			var nock = require('nock');
 			var result = {
 				'datum': 'some data'
 			};
 
 			beforeEach(function () {
-				var nock = require('nock');
 				nock(server).get(resource).delay(500).reply(200, result, {
+					'Content-Type': 'application/json'
+				});
+				nock(server).post(resource).delay(500).reply(200, result, {
 					'Content-Type': 'application/json'
 				});
 			});
 
-			describe('When I request the resource', function () {
+			afterEach(function () {
+				nock.cleanAll();
+			});
+
+			describe('When I submit a GET request to the resource', function () {
 
 				it('Then I should receive data from the resource', function (done) {
 					var url = server + resource;
@@ -38,22 +44,54 @@ describe('Given I want to make an asynchronous request for a resource', function
 				});
 
 			});
+
+			describe('When I submit a POST to the resource', function () {
+
+				it('Then I should receive data from the resource', function (done) {
+					var url = server + resource;
+					var options = {
+						url: url
+					};
+					var qUrl = q.post(options);
+
+					expect(qUrl).to.eventually.be.fulfilled.and.notify(done);
+				});
+
+			});
 		});
 
 		describe('And the resource returns with an error', function () {
+			var nock = require('nock');
 			var result = 'some error';
 
 			beforeEach(function () {
-				var nock = require('nock');
 				nock(server).get(resource).delay(500).reply(500, result);
+				nock(server).post(resource).delay(500).reply(500, result);
 			});
-			
-			describe('When I request the resource', function () {
-				
+
+			afterEach(function () {
+				nock.cleanAll();
+			});
+
+			describe('When I submit a GET request to the resource', function () {
+
 				it('Then I should receive a rejection from the resource', function (done) {
 					var url = server + resource;
 					var qUrl = q.get(url, {});
-					
+
+					expect(qUrl).to.eventually.be.rejected.and.notify(done);
+				});
+			});
+
+			describe('When I submit a POST to the resource', function () {
+
+				it('Then I should receive a rejection from the resource', function (done) {
+					var url = server + resource;
+					var options = {
+						url: url
+					};
+					var qUrl = q.post(options);
+
 					expect(qUrl).to.eventually.be.rejected.and.notify(done);
 				});
 			});
