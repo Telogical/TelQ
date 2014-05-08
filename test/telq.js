@@ -22,7 +22,10 @@ describe('Given I want to make an asynchronous request for a resource', function
 			};
 
 			beforeEach(function() {
-				nock(server).get(resource).delay(500).reply(200, result, {
+				nock(server).get(resource).delay(10).reply(200, result, {
+					'Content-Type': 'application/json'
+				});
+				nock(server).post(resource).delay(10).reply(200, result, {
 					'Content-Type': 'application/json'
 				});
 			});
@@ -41,6 +44,20 @@ describe('Given I want to make an asynchronous request for a resource', function
 				});
 
 			});
+
+			describe('When I submit a POST to the resource', function() {
+
+				it('Then I should receive data from the resource', function(done) {
+					var url = server + resource;
+					var options = {
+						url: url
+					};
+					var qUrl = q.post(options);
+
+					expect(qUrl).to.eventually.be.fulfilled.and.notify(done);
+				});
+
+			});
 		});
 
 		describe('And the resource returns with an error', function() {
@@ -48,8 +65,8 @@ describe('Given I want to make an asynchronous request for a resource', function
 			var result = 'some error';
 
 			beforeEach(function() {
-				nock(server).get(resource).delay(500).reply(500, result);
-				nock(server).post(resource).delay(500).reply(500, result);
+				nock(server).get(resource).delay(10).reply(500, result);
+				nock(server).post(resource).delay(10).reply(500, result);
 			});
 
 			afterEach(function() {
