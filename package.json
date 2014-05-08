@@ -1,9 +1,7 @@
 {
     "name": "TelQ",
     "version": "0.0.4",
-
     "main": "src/TelQ.js",
-
     "dependencies": {
         "request": "*",
         "rsvp": "*",
@@ -23,6 +21,7 @@
         "sinon-chai": "2.5.0",
         "mocha": "1.17.1",
         "nock": "0.28.3",
-        "chai-as-promised": "4.1.1"
+        "chai-as-promised": "4.1.1",
+        "mongoose": "3.8.8"
     }
 }
