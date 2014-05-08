@@ -27,6 +27,7 @@
         "it" : true,
         "expect" : true,
         "inject" : true,
-        "alert" : true
+        "alert" : true,
+        "require" : true
     }
 }
