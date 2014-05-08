@@ -4,6 +4,8 @@ var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
 var expect = chai.expect;
+var sinon = require('sinon');
+var mongoose = require('mongoose');
 
 
 describe('Given I want to make an asynchronous request for a resource', function() {
@@ -93,6 +95,84 @@ describe('Given I want to make an asynchronous request for a resource', function
 					var qUrl = q.post(options);
 
 					expect(qUrl).to.eventually.be.rejected.and.notify(done);
+				});
+			});
+		});
+	});
+
+	describe('And that resource is a document database', function() {
+		var schema = new mongoose.Schema({
+			x: 'string',
+			y: 'string'
+		});
+		var Tel = mongoose.model('Tel', schema);
+
+		describe('And I do not specify a database', function() {
+
+			it('Then it should reject with an error no model', function(done) {
+				var qDb = q.dbMongoose({});
+				expect(qDb).to.eventually.be.rejectedWith('no model').and.notify(done);
+			});
+		});
+
+		describe('And the resource returns without error', function() {
+			var result = {
+				'datum': 'some data'
+			};
+
+			var find = function(query, callback) {
+				callback(null, result);
+			};
+
+			beforeEach(function() {
+				sinon.stub(mongoose.models.Tel, 'find', find);
+			})
+
+			afterEach(function() {
+				mongoose.models.Tel.find.restore();
+			})
+
+			describe('When I request the resource', function() {
+
+				it('Then I should receive data from the resource', function(done) {
+					var options = {
+						database: Tel,
+						operation: 'find'
+					};
+
+					var qDb = q.dbMongoose(options);
+
+					expect(qDb).to.eventually.deep.equal(result).and.notify(done)
+				});
+			});
+		});
+
+		describe('And the resource returns with an error', function() {
+
+			var find = function(query, callback) {
+				callback('ERROR', {});
+			};
+
+			beforeEach(function() {
+				sinon.stub(mongoose.models.Tel, 'find', find);
+			})
+
+			afterEach(function() {
+				mongoose.models.Tel.find.restore();
+			})
+
+			describe('When I request the resource', function() {
+
+				it('Then I should receive data from the resource', function(done) {
+
+					var options = {
+						database: Tel,
+						operation: 'find'
+					};
+
+					var qDb = q.dbMongoose(options);
+
+					expect(qDb).to.eventually.be.rejectedWith('ERROR').and.notify(done)
 				});
 			});
 		});
