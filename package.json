@@ -1,27 +1,27 @@
 {
-  "name": "TelQ",
-  "version": "0.0.4",
-  "main": "src/TelQ.js",
-  "dependencies": {
-    "request": "*",
-    "rsvp": "*",
-    "querystring": "*",
-    "tedious": "*",
-    "lodash": "*"
-  },
-  "devDependencies": {
-    "grunt": "~0.4.1",
-    "load-grunt-tasks": "~0.1.0",
-    "matchdep": "0.1.2",
-    "istanbul": "0.1.43",
-    "mocha-teamcity-reporter": "0.0.2",
-    "tap": "0.4.8",
-    "chai": "1.9.0",
-    "sinon": "1.9.0",
-    "sinon-chai": "2.5.0",
-    "mocha": "1.17.1",
-    "nock": "0.28.3",
-    "chai-as-promised": "4.1.1",
-    "mongoose": "3.8.8"
-  }
+    "name": "TelQ",
+    "version": "0.0.5",
+    "main": "src/TelQ.js",
+    "dependencies": {
+        "request": "*",
+        "rsvp": "*",
+        "querystring": "*",
+        "tedious": "*",
+        "lodash": "*"
+    },
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "load-grunt-tasks": "~0.1.0",
+        "matchdep": "0.1.2",
+        "istanbul": "0.1.43",
+        "mocha-teamcity-reporter": "0.0.2",
+        "tap": "0.4.8",
+        "chai": "1.9.0",
+        "sinon": "1.9.0",
+        "sinon-chai": "2.5.0",
+        "mocha": "1.17.1",
+        "nock": "0.28.3",
+        "chai-as-promised": "4.1.1",
+        "mongoose": "3.8.8"
+    }
 }
