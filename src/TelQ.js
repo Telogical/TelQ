@@ -100,31 +100,35 @@ function TelQ() {
     function dbSql(options) {
 
         function qExecuteStatement(resolve, reject) {
-            var connection = new Connection(options.sqlServer);
+            var data;
 
-            //            connection.on('debug', function(text) {
-            //                // If no error, then good to go...
-            //                console.log('Debug: ' + text);
-            //            });
+            var connection = new Connection(options.config);
 
             connection.on('connect', function (err) {
-
                 if (err) {
-                    reject('Error connecting: ' + err);
+                    console.log('Error on connection', err);
+                    reject(new Error('Error connecting' + err));
                 }
 
-                var requestSql = new Request(options.query, function (err, rowCount) {
+                var request = new Request(options.query, function (err) {
                     if (err) {
                         connection.close();
-                        reject('Error with sql execution');
+                        console.log('Error on request', err);
+                        reject(new Error('Error with sql execution'));
                     }
 
                     connection.close();
-                    resolve('Statement executed successfully');
+                    resolve(data);
                 });
 
-                connection.execSql(requestSql);
-            })
+                request.on('row', function (columns) {
+                    data = {};
+                    _.each(columns, function (column) {
+                        data[column.metadata.colName] = column.value;
+                    });
+                });
+                connection.execSql(request);
+            });
         }
 
         return new RSVP.Promise(qExecuteStatement);
