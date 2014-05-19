@@ -2,10 +2,9 @@ var request = require('request');
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var qs = require('querystring');
-var Connection = require('tedious').Connection;
-var Request = require('tedious').Request;
 var reOrder = require('./../lib/reOrder.js');
 var cache = require('./q-cache');
+var tedious = require('tedious');
 
 var cacheTime = (60 * 1000); //cache specified in minutes
 var telQCachingEnabled = true;
@@ -99,8 +98,10 @@ function TelQ() {
 
     function dbSql(options) {
 
+
+
         function qExecuteStatement(resolve, reject) {
-            var connection = new Connection(options.sqlServer);
+            var connection = new tedious.Connection(options.sqlServer);
 
             //            connection.on('debug', function(text) {
             //                // If no error, then good to go...
@@ -113,7 +114,7 @@ function TelQ() {
                     reject('Error connecting: ' + err);
                 }
 
-                var requestSql = new Request(options.query, function (err, rowCount) {
+                var requestSql = new tedious.Request(options.query, function (err, rowCount) {
                     if (err) {
                         connection.close();
                         reject('Error with sql execution');
@@ -127,7 +128,13 @@ function TelQ() {
             })
         }
 
-        return new RSVP.Promise(qExecuteStatement);
+        if (options.sqlServer) {
+          return new RSVP.Promise(qExecuteStatement);
+        } else {
+          return new RSVP.Promise(function(resolve, reject){
+            reject('No server supplied');
+          });
+        }
     }
 
     var q = _.extend(this, RSVP);
