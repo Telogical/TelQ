@@ -74,7 +74,7 @@ function TelQ() {
     }
 
     function use(option) {
-      if(typeof option === 'object') {
+      if(option && typeof option === 'object') {
         q = _.assign(q, option);
       } else {
         throw 'Option not an object';
