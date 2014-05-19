@@ -37,6 +37,7 @@ describe('Given I want to make an asynchronous request for a resource', function
         nock.cleanAll();
       });
 
+
       describe('When I submit a GET request to the resource', function() {
 
         it('Then I should receive data from the resource', function(done) {
@@ -127,11 +128,11 @@ describe('Given I want to make an asynchronous request for a resource', function
 
       beforeEach(function() {
         sinon.stub(mongoose.models.Tel, 'find', find);
-      });
+      })
 
       afterEach(function() {
         mongoose.models.Tel.find.restore();
-      });
+      })
 
       describe('When I request the resource', function() {
 
@@ -143,7 +144,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
           var qDb = q.dbMongoose(options);
 
-          expect(qDb).to.eventually.deep.equal(result).and.notify(done);
+          expect(qDb).to.eventually.deep.equal(result).and.notify(done)
         });
       });
     });
@@ -156,11 +157,11 @@ describe('Given I want to make an asynchronous request for a resource', function
 
       beforeEach(function() {
         sinon.stub(mongoose.models.Tel, 'find', find);
-      });
+      })
 
       afterEach(function() {
         mongoose.models.Tel.find.restore();
-      });
+      })
 
       describe('When I request the resource', function() {
 
@@ -173,7 +174,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
           var qDb = q.dbMongoose(options);
 
-          expect(qDb).to.eventually.be.rejectedWith('ERROR').and.notify(done);
+          expect(qDb).to.eventually.be.rejectedWith('ERROR').and.notify(done)
         });
       });
     });
