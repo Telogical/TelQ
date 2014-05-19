@@ -4,7 +4,6 @@ var _ = require('lodash');
 var qs = require('querystring');
 var reOrder = require('./../lib/reOrder.js');
 var cache = require('./q-cache');
-var tedious = require('tedious');
 
 var cacheTime = (60 * 1000); //cache specified in minutes
 var telQCachingEnabled = true;
