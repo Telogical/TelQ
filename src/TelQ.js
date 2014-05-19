@@ -74,77 +74,21 @@ function TelQ() {
         return new RSVP.Promise(qGetHttp);
     }
 
-    function dbMongoose(options) {
-        var operation = options.operation || 'find';
-        var query = options.query || {};
-        var model = options.database;
-
-        function qGetDB(resolve, reject) {
-            if (!model) {
-                reject('no model');
-            }
-
-            function dbCallback(err, data) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(data);
-                }
-            }
-            model[operation](query, dbCallback);
-        }
-        return new RSVP.Promise(qGetDB);
+    function use(option) {
+      if(typeof option === 'object') {
+        q = _.assign(q, option);
+      } else {
+        throw 'Option not an object';
+      }
     }
 
-    function dbSql(options) {
-
-
-
-        function qExecuteStatement(resolve, reject) {
-            var connection = new tedious.Connection(options.sqlServer);
-
-            //            connection.on('debug', function(text) {
-            //                // If no error, then good to go...
-            //                console.log('Debug: ' + text);
-            //            });
-
-            connection.on('connect', function (err) {
-
-                if (err) {
-                    reject('Error connecting: ' + err);
-                }
-
-                var requestSql = new tedious.Request(options.query, function (err, rowCount) {
-                    if (err) {
-                        connection.close();
-                        reject('Error with sql execution');
-                    }
-
-                    connection.close();
-                    resolve('Statement executed successfully');
-                });
-
-                connection.execSql(requestSql);
-            })
-        }
-
-        if (options.sqlServer) {
-          return new RSVP.Promise(qExecuteStatement);
-        } else {
-          return new RSVP.Promise(function(resolve, reject){
-            reject('No server supplied');
-          });
-        }
-    }
-
-    var q = _.extend(this, RSVP);
+    var q = _.assign(this, RSVP);
 
     //RSVP.configure('onerror', function(reason){ console.assert(false,reason)}); //Error handling?
 
+    q.use = use;
     q.post = post;
     q.get = get;
-    q.dbMongoose = dbMongoose;
-    q.dbSql = dbSql;
     return q;
 }
 
