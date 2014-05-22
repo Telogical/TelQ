@@ -6,7 +6,7 @@ var tedious = require('tedious');
 var dbSql = {
   dbSql: function(options) {
     function qExecuteStatement(resolve, reject) {
-      var connection = new tedious.Connection(options.sqlServer);
+      var connection = new tedious.Connection(options.source);
       var data = {
         status: 'Statement executed successfully'
       };
@@ -44,7 +44,7 @@ var dbSql = {
       });
     }
 
-    if (options.sqlServer) {
+    if (options.source) {
       return new RSVP.Promise(qExecuteStatement);
     } else {
       return new RSVP.Promise(function(resolve, reject) {

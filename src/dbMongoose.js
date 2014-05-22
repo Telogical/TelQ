@@ -6,7 +6,7 @@ var dbMongoose = {
   dbMongoose: function(options) {
     var operation = options.operation || 'find';
     var query = options.query || {};
-    var model = options.database;
+    var model = options.source;
 
     function qGetDB(resolve, reject) {
       if (!model) {

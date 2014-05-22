@@ -111,8 +111,10 @@ describe('Given I want to make an asynchronous request for a resource', function
       describe('When I submit a GET request to the resource', function() {
 
         it('Then I should receive data from the resource', function(done) {
-          var url = server + resource;
-          var qUrl = q.get(url, {});
+          var options = {
+            source: server + resource
+          };
+          var qUrl = q.get(options);
 
           expect(qUrl).to.eventually.deep.equal(result).and.notify(done);
         });
@@ -122,9 +124,8 @@ describe('Given I want to make an asynchronous request for a resource', function
       describe('When I submit a POST to the resource', function() {
 
         it('Then I should receive data from the resource', function(done) {
-          var url = server + resource;
           var options = {
-            url: url
+            source: server + resource
           };
           var qUrl = q.post(options);
 
@@ -150,8 +151,10 @@ describe('Given I want to make an asynchronous request for a resource', function
       describe('When I submit a GET request to the resource', function() {
 
         it('Then I should receive a rejection from the resource', function(done) {
-          var url = server + resource;
-          var qUrl = q.get(url, {});
+          var options = {
+            source: server + resource
+          };
+          var qUrl = q.get(options);
 
           expect(qUrl).to.eventually.be.rejected.and.notify(done);
         });
@@ -160,9 +163,8 @@ describe('Given I want to make an asynchronous request for a resource', function
       describe('When I submit a POST to the resource', function() {
 
         it('Then I should receive a rejection from the resource', function(done) {
-          var url = server + resource;
           var options = {
-            url: url
+            source: server + resource
           };
           var qUrl = q.post(options);
 
