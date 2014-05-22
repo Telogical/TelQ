@@ -7,7 +7,9 @@ var dbSql = {
   dbSql: function(options) {
     function qExecuteStatement(resolve, reject) {
       var connection = new tedious.Connection(options.sqlServer);
-      var data = 'Statement executed successfully';
+      var data = {
+        status: 'Statement executed successfully'
+      };
 
       //            connection.on('debug', function(text) {
       //                // If no error, then good to go...
@@ -46,7 +48,7 @@ var dbSql = {
       return new RSVP.Promise(qExecuteStatement);
     } else {
       return new RSVP.Promise(function(resolve, reject) {
-        reject('No server supplied');
+        reject(new Error('No server supplied'));
       });
     }
   }

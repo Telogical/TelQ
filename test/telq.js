@@ -279,7 +279,9 @@ describe('Given I want to make an asynchronous request for a resource', function
 
     describe('And the resource returns without an error', function() {
 
-      var result = 'Statement executed successfully';
+      var result = {
+        status: 'Statement executed successfully'
+      };
 
       var fakeRequest = function(sql, callback) {
         callback(false, '');
