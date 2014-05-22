@@ -7,6 +7,7 @@ var dbSql = {
   dbSql: function(options) {
     function qExecuteStatement(resolve, reject) {
       var connection = new tedious.Connection(options.sqlServer);
+      var data = 'Statement executed successfully';
 
       //            connection.on('debug', function(text) {
       //                // If no error, then good to go...
@@ -16,20 +17,28 @@ var dbSql = {
       connection.on('connect', function(err) {
 
         if (err) {
-          reject('Error connecting: ' + err);
+          console.log('Error on connection', err);
+          reject(new Error('Error connecting: ' + err));
         }
 
-        var requestSql = new tedious.Request(options.query, function(err, rowCount) {
+        var request = new tedious.Request(options.query, function(err) {
           if (err) {
             connection.close();
-            reject('Error with sql execution');
+            reject(new Error('Error with sql execution'));
           }
 
           connection.close();
-          resolve('Statement executed successfully');
+          resolve(data);
         });
 
-        connection.execSql(requestSql);
+        request.on('row', function(columns) {
+          data = {};
+          _.each(columns, function(column) {
+            data[column.metadata.colName] = column.value;
+          });
+        });
+
+        connection.execSql(request);
       });
     }
 
