@@ -19,15 +19,15 @@ function TelQ() {
 
             function requestCallback(error, response, body) {
                 if (!error && response.statusCode === 200) {
+                    var result = typeof body ==='string' ? JSON.parse(body) : body;
+
                     if (telQCachingEnabled && options.expires > 0) {
                         cache.add({
                             id: url,
-                            value: [body, response],
+                            value: [result, response],
                             expires: new Date(new Date().getTime() + options.expires)
                         });
                     }
-
-                    var result = typeof body ==='string' ? JSON.parse(body) : body;
 
                     resolve(result, response);
                 } else {
