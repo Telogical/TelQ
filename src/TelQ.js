@@ -36,7 +36,7 @@ function TelQ() {
       }
 
       function returnIfCached(cachedItem) {
-        if (cachedItem.id === options.source) {
+        if (cachedItem.id === url) {
           resolve(cachedItem.value[0], cachedItem.value[1]);
         }
       }
