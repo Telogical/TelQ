@@ -37,7 +37,15 @@ function TelQ() {
 
             function returnIfCached(cachedItem) {
                 if (cachedItem.id === url) {
-                    resolve(cachedItem.value[0], cachedItem.value[1]);
+                  var result = (typeof cachedItem.value[0] === 'string') ?
+                        JSON.parse(cachedItem.value[0]) :
+                        cachedItem.value[0];
+
+                    var response = (typeof cachedItem.value[1] === 'string') ?
+                        JSON.parse(cachedItem.value[1]) :
+                        cachedItem.value[1];
+
+                    resolve(result, response);
                 }
             }
 
