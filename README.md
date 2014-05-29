@@ -64,13 +64,13 @@ var dbSql = require('src/dbSql.js');
 q.use(dbSql);
 
 var options = {
-    query: 'SELECT * FROM Cats',
-    sqlServer: {
+    source: {
         server: 'address of server',
         userName: 'User',
         password: 'Password',
         query_databases: {pets: 'Pets'}
-    }
+    },
+    query: 'SELECT * FROM Cats'
 };
 
 var qSql = q.dbSql(options);
