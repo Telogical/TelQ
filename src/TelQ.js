@@ -18,15 +18,15 @@ function TelQ() {
 
             function requestCallback(error, response, body) {
                 if (!error && response.statusCode === 200) {
+                    var result = typeof body ==='string' ? JSON.parse(body) : body;
+
                     if (telQCachingEnabled && options.expires > 0) {
                         cache.add({
                             id: url,
-                            value: [body, response],
+                            value: [result, response],
                             expires: new Date(new Date().getTime() + options.expires)
                         });
                     }
-
-                    var result = typeof body ==='string' ? JSON.parse(body) : body;
 
                     resolve(result, response);
                 } else {
@@ -36,7 +36,15 @@ function TelQ() {
 
             function returnIfCached(cachedItem) {
                 if (cachedItem.id === url) {
-                    resolve(cachedItem.value[0], cachedItem.value[1]);
+                  var result = (typeof cachedItem.value[0] === 'string') ?
+                        JSON.parse(cachedItem.value[0]) :
+                        cachedItem.value[0];
+
+                    var response = (typeof cachedItem.value[1] === 'string') ?
+                        JSON.parse(cachedItem.value[1]) :
+                        cachedItem.value[1];
+
+                    resolve(result, response);
                 }
             }
 
