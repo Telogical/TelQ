@@ -40,7 +40,6 @@ function TelQ() {
         }
       }
 
-
       options.params = options.params ? reOrder(options.params) : null;
 
       url = (options.params) ?
@@ -68,7 +67,6 @@ function TelQ() {
         }
       }
       request.post(options, requestCallback);
-
     }
     return new RSVP.Promise(qGetHttp);
   }
