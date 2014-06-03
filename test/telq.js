@@ -210,7 +210,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
         it('Then I should receive data from the resource', function(done) {
           var options = {
-            database: Tel,
+            source: Tel,
             operation: 'find'
           };
 
@@ -240,7 +240,7 @@ describe('Given I want to make an asynchronous request for a resource', function
         it('Then I should receive data from the resource', function(done) {
 
           var options = {
-            database: Tel,
+            source: Tel,
             operation: 'find'
           };
 
@@ -303,7 +303,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
         it('Then it should receive data from the resource', function(done) {
           var opts = {
-            sqlServer: 'local',
+            source: 'local',
             query: 'SELECT * FROM USERS'
           };
           var qSql = q.dbSql(opts);
@@ -335,7 +335,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
         it('Then it should receive an error from the resource', function(done) {
           var opts = {
-            sqlServer: 'local',
+            source: 'local',
             query: 'SELECT * FROM USERS'
           };
           var qSql = q.dbSql(opts);
