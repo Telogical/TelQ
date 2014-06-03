@@ -27,7 +27,6 @@ var options = {
 var qUrl = q.get(options);
 
 qUrl.then(resolveCallback, rejectCallback);
-
 ```
 
 TelQ can also be extended for backend applications to connect to either a mongodb instance or a microsoft sqlserver instance.  The dbMongoose extension wraps [mongoosejs](http://mongoosejs.com).  So for the options.source property you should give an instance of the model you wish to query.  The mongo extenstion also requires the operation you want to execute to be included in the options param.  
@@ -55,3 +54,34 @@ var options = {
 var qDb = q.dbMongoose(options);
 qDb.then(resolveCallback, rejectCallback);
 ```
+
+The dbSql extension wraps [tedious](https://github.com/pekim/tedious).  The options.source property should be an object with the address of the sql instance you wish to connect to, username, password, and an object with the queried databases.  Also you will include the string query you wish to execute.  If you are executing a read query the data will be passed back through the data parameter of the success callback.
+
+```
+var q = require('src/TelQ.js');
+var dbSql = require('src/dbSql.js');
+
+q.use(dbSql);
+
+var options = {
+    source: {
+        server: 'address of server',
+        userName: 'User',
+        password: 'Password',
+        query_databases: {pets: 'Pets'}
+    },
+    query: 'SELECT * FROM Cats'
+};
+
+var qSql = q.dbSql(options);
+
+qSql.then(resolveCallback, rejectCallback);
+```
+
+
+
+
+
+
+
+
