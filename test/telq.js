@@ -8,8 +8,8 @@ var sinon = require('sinon');
 var mongoose = require('mongoose');
 var tedious = require('tedious');
 var _ = require('lodash');
-var dbMongoose = require('./../src/dbMongoose');
-var dbSql = require('./../src/dbSql');
+var dbMongoose = require('./../dbMongoose');
+var dbSql = require('./../dbSql');
 
 describe('Given I want to use TelQ', function() {
 
