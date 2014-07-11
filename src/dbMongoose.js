@@ -5,6 +5,7 @@ var RSVP = require('rsvp');
 var dbMongoose = {
   dbMongoose: function(options) {
     var operation = options.operation || 'find';
+    var conditions = options.conditions || null;
     var query = options.query || {};
     var model = options.database;
 
@@ -20,7 +21,7 @@ var dbMongoose = {
           resolve(data);
         }
       }
-      model[operation](query, dbCallback);
+       conditions ? model[operation](conditions, query, dbCallback) : model[operation](query, dbCallback);
     }
     return new RSVP.Promise(qGetDB);
   }
