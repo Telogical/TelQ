@@ -7,7 +7,77 @@ var expect = chai.expect;
 var sinon = require('sinon');
 var mongoose = require('mongoose');
 var tedious = require('tedious');
+var _ = require('lodash');
+var dbMongoose = require('./../src/dbMongoose');
+var dbSql = require('./../src/dbSql');
 
+describe('Given I want to use TelQ', function() {
+
+  describe('When I initialize TelQ', function() {
+
+    var q;
+
+    beforeEach(function() {
+      q = require('./../src/TelQ');
+    });
+
+    it('Then it should have a get function by default', function(done) {
+      var hasGet = _.has(q, 'get');
+      expect(hasGet).to.equal(true);
+      done();
+    });
+
+    it('Then it should have a post function by default', function(done) {
+      var hasPost = _.has(q, 'post');
+      expect(hasPost).to.equal(true);
+      done();
+    });
+
+    it('Then it should not have a dbMongoose function by default', function(done) {
+      var hasMongoose = _.has(q, 'dbMongoose');
+
+      expect(hasMongoose).to.equal(false);
+      done();
+    });
+
+    it('Then it should not have a dbSql function by default', function(done) {
+      var hasSql = _.has(q, 'dbSql');
+
+      expect(hasSql).to.equal(false);
+      done();
+    });
+  });
+
+  describe('And I initialize TelQ', function() {
+
+    var qM = require('./../src/TelQ.js');
+
+    describe('When I add in a document database source', function() {
+      beforeEach(function() {
+        qM.use(dbMongoose);
+      });
+
+
+      it('Then it should have a dbMongoose function', function(done) {
+        var hasMongoose = _.has(qM, 'dbMongoose');
+        expect(hasMongoose).to.equal(true);
+        done();
+      });
+    });
+
+    describe('When I add in a sql database source', function() {
+      beforeEach(function() {
+        qM.use(dbSql);
+      });
+
+      it('Then it should have a dbSql function', function(done) {
+        var hasSql = _.has(qM, 'dbSql');
+        expect(hasSql).to.equal(true);
+        done();
+      });
+    });
+  });
+});
 
 describe('Given I want to make an asynchronous request for a resource', function() {
 
@@ -128,11 +198,11 @@ describe('Given I want to make an asynchronous request for a resource', function
 
       beforeEach(function() {
         sinon.stub(mongoose.models.Tel, 'find', find);
-      })
+      });
 
       afterEach(function() {
         mongoose.models.Tel.find.restore();
-      })
+      });
 
       describe('When I request the resource', function() {
 
@@ -144,7 +214,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
           var qDb = q.dbMongoose(options);
 
-          expect(qDb).to.eventually.deep.equal(result).and.notify(done)
+          expect(qDb).to.eventually.deep.equal(result).and.notify(done);
         });
       });
     });
@@ -157,11 +227,11 @@ describe('Given I want to make an asynchronous request for a resource', function
 
       beforeEach(function() {
         sinon.stub(mongoose.models.Tel, 'find', find);
-      })
+      });
 
       afterEach(function() {
         mongoose.models.Tel.find.restore();
-      })
+      });
 
       describe('When I request the resource', function() {
 
@@ -174,7 +244,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
           var qDb = q.dbMongoose(options);
 
-          expect(qDb).to.eventually.be.rejectedWith('ERROR').and.notify(done)
+          expect(qDb).to.eventually.be.rejectedWith('ERROR').and.notify(done);
         });
       });
     });
@@ -209,7 +279,9 @@ describe('Given I want to make an asynchronous request for a resource', function
 
     describe('And the resource returns without an error', function() {
 
-      var result = 'Statement executed successfully';
+      var result = {
+        status: 'Statement executed successfully'
+      };
 
       var fakeRequest = function(sql, callback) {
         callback(false, '');
