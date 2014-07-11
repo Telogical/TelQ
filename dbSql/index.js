@@ -11,46 +11,46 @@ var dbSql = {
         status: 'Statement executed successfully'
       };
 
-      //            connection.on('debug', function(text) {
-      //                // If no error, then good to go...
-      //                console.log('Debug: ' + text);
-      //            });
+      function onRequestError(err) {
+        if (err) {
+          connection.close();
+          reject(new Error('Error with sql execution'));
+        }
 
-      connection.on('connect', function(err) {
+        connection.close();
+        resolve(data);
+      }
 
+      function onRow(columns) {
+        data = {};
+        function onColumn(column) {
+          data[column.metadata.colName] = column.value;
+        }
+
+        _.each(columns, onColumn);
+      }
+
+      function onConnection(err) {
         if (err) {
           console.log('Error on connection', err);
           reject(new Error('Error connecting: ' + err));
         }
 
-        var request = new tedious.Request(options.query, function(err) {
-          if (err) {
-            connection.close();
-            reject(new Error('Error with sql execution'));
-          }
-
-          connection.close();
-          resolve(data);
-        });
-
-        request.on('row', function(columns) {
-          data = {};
-          _.each(columns, function(column) {
-            data[column.metadata.colName] = column.value;
-          });
-        });
-
+        var request = new tedious.Request(options.query, onRequestError);
+        request.on('row', onRow);
         connection.execSql(request);
-      });
+      }
+
+      connection.on('connect', onConnection);
     }
 
-    if (options.source) {
-      return new RSVP.Promise(qExecuteStatement);
-    } else {
-      return new RSVP.Promise(function(resolve, reject) {
-        reject(new Error('No server supplied'));
-      });
+    function noServerError(resolve, reject) {
+      reject(new Error('No server supplied'));
     }
+
+    return options.source
+      ? new RSVP.Promise(qExecuteStatement)
+      : new RSVP.Promise(noServerError);
   }
 };
 

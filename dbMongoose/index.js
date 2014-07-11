@@ -20,8 +20,10 @@ var dbMongoose = {
           resolve(data);
         }
       }
+    
       model[operation](query, dbCallback);
     }
+
     return new RSVP.Promise(qGetDB);
   }
 };
