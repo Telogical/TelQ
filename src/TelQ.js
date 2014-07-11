@@ -27,7 +27,7 @@ function TelQ() {
             });
           }
 
-          var result = typeof body === 'string' ? JSON.parse(body) : body;
+                    var result = typeof body ==='string' ? JSON.parse(body) : body;
 
           resolve(result, response);
         } else {
@@ -40,7 +40,6 @@ function TelQ() {
           resolve(cachedItem.value[0], cachedItem.value[1]);
         }
       }
-
 
       options.params = options.params ? reOrder(options.params) : null;
 
