@@ -5,7 +5,7 @@ var istanbul = require('gulp-istanbul');
 var mocha = require('gulp-mocha'); // Using mocha here, but any test framework will work
 
 gulp.task('test', function (cb) {
-  gulp.src(['src/**/*.js', 'TelQ.js'])
+  gulp.src(['src/**/*.js', 'dbMongoose/*.js' , 'dbSql/*.js'])
     .pipe(istanbul()) // Covering files
     .on('finish', function () {
       gulp.src(['test/*.js'])

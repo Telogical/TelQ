@@ -11,22 +11,28 @@ var telQCachingEnabled = true;
 function TelQ() {
   'use strict';
 
-  function get(url, options) {
+  function get(options) {
     options.expires = (options.expires || 0) * cacheTime;
+    options.params = options.params ? reOrder(options.params) : null;
+
+    var url = (options.params) 
+        ? options.source + '?' + qs.stringify(options.params) 
+        : options.source;
 
     function qGetHttp(resolve, reject) {
 
       function requestCallback(error, response, body) {
         if (!error && response.statusCode === 200) {
-          var result = typeof body === 'string' ? JSON.parse(body) : body;
+
+          var result = typeof body ==='string' ? JSON.parse(body) : body;
 
           if (telQCachingEnabled && options.expires > 0) {
             cache.add({
               id: url,
-              value: [result, response],
+              value: [body, response],
               expires: new Date(new Date().getTime() + options.expires)
             });
-          }
+          }                 
 
           resolve(result, response);
         } else {
@@ -38,13 +44,7 @@ function TelQ() {
         if (cachedItem.id === url) {
           resolve(cachedItem.value[0], cachedItem.value[1]);
         }
-      }
-
-      options.params = options.params ? reOrder(options.params) : null;
-
-      url = (options.params) ?
-        url + '?' + qs.stringify(options.params) :
-        url;
+      }      
 
       //memoize short circuit.
       if (telQCachingEnabled) {
@@ -58,6 +58,8 @@ function TelQ() {
   }
 
   function post(options) {
+    options.url = options.source;
+
     function qGetHttp(resolve, reject) {
       function requestCallback(error, response, body) {
         if (!error && response.statusCode === 200) {
@@ -67,6 +69,7 @@ function TelQ() {
         }
       }
       request.post(options, requestCallback);
+
     }
     return new RSVP.Promise(qGetHttp);
   }
