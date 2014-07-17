@@ -2,6 +2,7 @@
 
 var RSVP = require('rsvp');
 var tedious = require('tedious');
+var _ = require('lodash');
 
 var dbSql = {
   dbSql: function(options) {
