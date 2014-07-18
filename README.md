@@ -77,6 +77,65 @@ var qSql = q.dbSql(options);
 
 qSql.then(resolveCallback, rejectCallback);
 ```
+#Plugin Creation
+
+At some point you might decide to extend TelQ to encapsulate some domain process or resource. 
+A plugin is function that takes q as its only parameter , with functions that take a single options object.
+
+```js
+
+function someResource(q) {
+
+    function operationUno(opts) {
+        var defer = q.defer();
+    
+        //async stuff
+        q.resolve('uno!');
+        
+        return defer.promise();
+    }
+    
+    function operationDos(opts){
+        
+        return q.resolve('dos!');
+    }
+
+    q.domainVernacular  = {
+        operationUno: operationUno,
+        operationDos: operationDos
+    
+    };
+
+    return q;
+}
+
+module.exports = someResource;
+
+```
+
+if the q plugin is top level (eg it is a resource, such as dbSql, or db Mongoose), then the options should conform to this schema:
+
+```js
+{
+  source: 'The source of the data',
+  query: 'The filters for the source data (querystring params, query params, etc)
+}
+
+```
+
+if the q plugin is domain level, then the domain concerns will dictate the object schema. These should reside in the `telogical` namespace.
+to prevent stomping on other plugins being fluently configured use
+
+```js
+
+q.telogical = q.telogical || {};
+
+```
+at the top of the plugin.
+
+
+
+
 
 
 

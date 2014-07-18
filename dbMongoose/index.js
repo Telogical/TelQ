@@ -1,31 +1,36 @@
 'use strict';
 
-var RSVP = require('rsvp');
+function dbMongoose(q) {
 
-var dbMongoose = {
-  dbMongoose: function(options) {
-    var operation = options.operation || 'find';
-    var query = options.query || {};
-    var model = options.source;
+    function qDbMongoose(options) {
 
-    function qGetDB(resolve, reject) {
-      if (!model) {
-        reject('no model');
-      }
+        var operation = options.operation || 'find',
+            query = options.query || {},
+            model = options.source;
 
-      function dbCallback(err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
+        function qGetDB(resolve, reject) {
+            if (!model) {
+                reject('no model');
+            }
+
+            function dbCallback(err, data) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(data);
+                }
+            }
+
+            model[operation](query, dbCallback);
         }
-      }
-    
-      model[operation](query, dbCallback);
+
+        return new q.Promise(qGetDB);
     }
 
-    return new RSVP.Promise(qGetDB);
-  }
-};
+
+    q.dbMongoose = qDbMongoose;
+
+    return q;
+}
 
 module.exports = dbMongoose;
