@@ -7,8 +7,8 @@ parameter.  The options object for all TelQ functions require two properties.
 
 ```js
 {
-  source: 'The source of the data',
-  query: 'The filters for the source data (querystring params, query params, etc)
+  url: 'The source of the data',
+  params: 'The filters for the source data (querystring params, query params, etc)
 }
 ```
 
@@ -21,8 +21,8 @@ needed for other http functions should be included in the options object
 var q = require('src/TelQ.js');
 
 var options = {
-  source: 'http://someapi',
-  query: {
+  url: 'http://someapi',
+  params: {
       param1Key: 'param1Value',
       param2Key: 'param2Value'
     }
@@ -34,6 +34,16 @@ qUrl.then(resolveCallback, rejectCallback);
 ```
 
 ##Resources
+
+All top level (eg it is a resource, such as dbSql, or db Mongoose) plugins input options should conform to this schema:
+
+```js
+{
+  source: 'The source of the data',
+  query: 'The filters for the source data (querystring params, query params, etc)
+}
+
+```
 
 ###DbMongoose
 

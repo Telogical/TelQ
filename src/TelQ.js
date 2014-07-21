@@ -12,12 +12,18 @@ function TelQ() {
     'use strict';
 
     function get(options) {
-        options.expires = (options.expires || 0) * cacheTime;
-        options.params = options.params ? reOrder(options.params) : null;
-
-        var url = (options.params) ? options.source + '?' + qs.stringify(options.params) : options.source;
 
         function qGetHttp(resolve, reject) {
+            options.expires = (options.expires || 0) * cacheTime;
+
+            var sanitizedOptions = checkRequiredInputs(options);
+
+            if (!sanitizedOptions.url) {
+                reject(new Error('No url or source provided.'));
+            }
+
+            var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+                url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
             function requestCallback(error, response, body) {
                 if (!error && response.statusCode === 200) {
@@ -56,9 +62,21 @@ function TelQ() {
     }
 
     function post(options) {
-        options.url = options.source;
 
         function qGetHttp(resolve, reject) {
+
+            var sanitizedOptions = checkRequiredInputs(options);
+
+            if (!sanitizedOptions.url) {
+                reject(new Error('No url or source provided.'));
+            }
+
+            var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+                url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+            options.url = sanitizedOptions.url;
+            options.params = sanitizedOptions.params;
+
             function requestCallback(error, response, body) {
                 if (!error && response.statusCode === 200) {
                     resolve(body, response);
@@ -66,17 +84,29 @@ function TelQ() {
                     reject(error);
                 }
             }
+
             request.post(options, requestCallback);
 
         }
+
         return new RSVP.Promise(qGetHttp);
+    }
+
+    function checkRequiredInputs(options) {
+        var _url = options.url || options.source,
+            _params = options.params || options.query;
+
+        return {
+            url: _url,
+            params: _params
+        };
     }
 
     function use(plugin) {
         if (plugin && plugin instanceof Function) {
             return plugin(q);
         }
-    
+
         throw 'Must provide TelQ plugin as instance of Function';
     }
 
