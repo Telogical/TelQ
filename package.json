@@ -1,6 +1,6 @@
 {
   "name": "TelQ",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "main": "src/TelQ.js",
   "dependencies": {
     "request": "*",
