@@ -6,6 +6,7 @@ function dbMongoose(q) {
 
         var operation = options.operation || 'find',
             query = options.query || {},
+            conditions = options.conditions || null,
             model = options.source;
 
         function qGetDB(resolve, reject) {
@@ -21,7 +22,7 @@ function dbMongoose(q) {
                 }
             }
 
-            model[operation](query, dbCallback);
+            conditions ? model[operation](conditions, query, dbCallback) : model[operation](query, dbCallback);
         }
 
         return new q.Promise(qGetDB);
