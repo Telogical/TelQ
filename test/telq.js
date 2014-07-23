@@ -11,6 +11,9 @@ var _ = require('lodash');
 var dbMongoose = require('./../dbMongoose');
 var dbSql = require('./../dbSql');
 
+var EventEmitter = require('events').EventEmitter;
+var emitter = new EventEmitter;
+
 describe('Given I want to use TelQ', function() {
 
   describe('When I initialize TelQ', function() {
@@ -281,9 +284,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
     describe('And the resource returns without an error', function() {
 
-      var result = {
-        status: 'Statement executed successfully'
-      };
+      var result = [];
 
       var fakeRequest = function(sql, callback) {
         callback(false, '');
@@ -312,6 +313,7 @@ describe('Given I want to make an asynchronous request for a resource', function
         });
       });
     });
+
 
     describe('And the resource returns with an error', function() {
 

@@ -7,29 +7,25 @@ function dbSql(q) {
 
     function qDbSql(options) {
         function qExecuteStatement(resolve, reject) {
+            var results = [];
             var connection = new tedious.Connection(options.source);
-            var data = {
-                status: 'Statement executed successfully'
-            };
 
-            function onRequestError(err) {
+            function onRequestError(err, rowCount) {
                 if (err) {
                     connection.close();
                     reject(new Error('Error with sql execution'));
                 }
 
                 connection.close();
-                resolve(data);
+                resolve(results);
             }
 
             function onRow(columns) {
-                data = {};
-
-                function onColumn(column) {
+                var data = {};
+                _.each(columns, function (column) {
                     data[column.metadata.colName] = column.value;
-                }
-
-                _.each(columns, onColumn);
+                });
+                results.push(data);
             }
 
             function onConnection(err) {
