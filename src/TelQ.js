@@ -33,7 +33,7 @@ function TelQ() {
                     if (telQCachingEnabled && options.expires > 0) {
                         cache.add({
                             id: url,
-                            value: [body, response],
+                            value: [result, response],
                             expires: new Date(new Date().getTime() + options.expires)
                         });
                     }
