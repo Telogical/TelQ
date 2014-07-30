@@ -6,30 +6,66 @@ var _ = require('lodash');
 function dbSql(q) {
 
     function qDbSql(options) {
-        function qExecuteStatement(resolve, reject) {
-            var connection = new tedious.Connection(options.source);
-            var data = {
-                status: 'Statement executed successfully'
-            };
 
-            function onRequestError(err) {
+        function qExecuteStoredProcedure(resolve, reject) {
+            var results = [];
+            var connection = new tedious.Connection(options.source);
+
+            function requestCallback(err, rowCount) {
+                if (err) {
+                    connection.close();
+                    reject(new Error('Error with sql execution: ' + err));
+                }
+                connection.close();
+                resolve(results);
+            }
+
+            function onConnection(err) {
+                if (err) {
+                    reject(new Error('Error connecting: ' + err));
+                }
+
+                var request = new tedious.Request(options.query, requestCallback);
+
+                _.each(options.params, function (param) {
+                    request.addParameter(param.name, param.type, param.value);
+                });
+
+                function onRow(columns) {
+                    results.push(columns);
+                }
+
+                request.on('row', onRow);
+                request.on('done', function () {
+                    connection.close();
+                });
+
+                connection.callProcedure(request);
+            }
+
+            connection.on('connect', onConnection);
+        }
+
+        function qExecuteStatement(resolve, reject) {
+            var results = [];
+            var connection = new tedious.Connection(options.source);
+
+            function onRequestError(err, rowCount) {
                 if (err) {
                     connection.close();
                     reject(new Error('Error with sql execution'));
                 }
 
                 connection.close();
-                resolve(data);
+                resolve(results);
             }
 
             function onRow(columns) {
-                data = {};
-
-                function onColumn(column) {
+                var data = {};
+                _.each(columns, function (column) {
                     data[column.metadata.colName] = column.value;
-                }
-
-                _.each(columns, onColumn);
+                });
+                results.push(data);
             }
 
             function onConnection(err) {
@@ -50,7 +86,15 @@ function dbSql(q) {
             reject(new Error('No server supplied'));
         }
 
-        return options.source ? new q.Promise(qExecuteStatement) : new q.Promise(noServerError);
+        if (!options.source) {
+            return new q.Promise(noServerError);
+        }
+        if (options.query_type == 'storedProcedure') {
+            return new q.Promise(qExecuteStoredProcedure);
+        }
+        else {
+            return new q.Promise(qExecuteStatement);
+        }
 
     }
 
