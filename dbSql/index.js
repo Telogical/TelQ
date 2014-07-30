@@ -6,6 +6,46 @@ var _ = require('lodash');
 function dbSql(q) {
 
     function qDbSql(options) {
+
+        function qExecuteStoredProcedure(resolve, reject) {
+            var results = [];
+            var connection = new tedious.Connection(options.source);
+
+            function requestCallback(err, rowCount) {
+                if (err) {
+                    connection.close();
+                    reject(new Error('Error with sql execution: ' + err));
+                }
+                connection.close();
+                resolve(results);
+            }
+
+            function onConnection(err) {
+                if (err) {
+                    reject(new Error('Error connecting: ' + err));
+                }
+
+                var request = new tedious.Request(options.query, requestCallback);
+
+                _.each(options.params, function (param) {
+                    request.addParameter(param.name, param.type, param.value);
+                });
+
+                function onRow(columns) {
+                    results.push(columns);
+                }
+
+                request.on('row', onRow);
+                request.on('done', function () {
+                    connection.close();
+                });
+
+                connection.callProcedure(request);
+            }
+
+            connection.on('connect', onConnection);
+        }
+
         function qExecuteStatement(resolve, reject) {
             var results = [];
             var connection = new tedious.Connection(options.source);
@@ -46,7 +86,15 @@ function dbSql(q) {
             reject(new Error('No server supplied'));
         }
 
-        return options.source ? new q.Promise(qExecuteStatement) : new q.Promise(noServerError);
+        if (!options.source) {
+            return new q.Promise(noServerError);
+        }
+        if (options.query_type == 'storedProcedure') {
+            return new q.Promise(qExecuteStoredProcedure);
+        }
+        else {
+            return new q.Promise(qExecuteStatement);
+        }
 
     }
 
