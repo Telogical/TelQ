@@ -101,6 +101,30 @@ var qSql = q.dbSql(options);
 
 qSql.then(resolveCallback, rejectCallback);
 ```
+
+You can also tell the dbSql extension to execute a stored procedure.  The options.source property remains the same as the string query method, but for the query property you should give the stored procedure name.  There are two additional properties that need to be added for this function which are options.queryType and options.params.  QueryType should be a string of 'storedProcedure' and params is an array of objects with the properties shown below.
+
+```js
+var TYPES = tedious.TYPES;
+var options = {
+                queryType: 'storedProcedure',
+                source: sqlserver_database,
+                query: databaseName + '.stored_procedure_name',
+                params: [
+                    {
+                        name: 'ParameterName1',
+                        type: TYPES.VarChar,
+                        value: ParameterValue1
+                    },
+                    {
+                        name: 'ParameterName2',
+                        type: TYPES.Int,
+                        value: ParameterValue2
+                    }
+                ]
+            };
+var promise = q.dbSql(options);
+```
 #Plugin Creation
 
 At some point you might decide to extend TelQ to encapsulate some domain process or resource. 
