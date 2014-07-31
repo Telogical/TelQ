@@ -416,7 +416,7 @@ describe('Given a TelQ with db Sql Resource', function () {
         beforeEach(function () {
             TYPES = tedious.TYPES;
             options = {
-                query_type: 'storedProcedure',
+                queryType: 'storedProcedure',
                 source: sqlserver_database,
                 query: databaseName + '.Rules.InsertIntoRulesTables',
                 params: [
@@ -518,7 +518,7 @@ describe('Given a TelQ with db Sql Resource', function () {
         beforeEach(function () {
             TYPES = tedious.TYPES;
             options = {
-                query_type: 'storedProcedure',
+                queryType: 'storedProcedure',
                 source: sqlserver_database,
                 query: databaseName + '.Rules.InsertIntoRulesTables',
                 params: [
@@ -585,7 +585,7 @@ describe('Given a TelQ with db Sql Resource', function () {
         beforeEach(function () {
             TYPES = tedious.TYPES;
             options = {
-                query_type: 'storedProcedure',
+                queryType: 'storedProcedure',
                 source: sqlserver_database,
                 query: databaseName + '.Rules.InsertIntoRulesTables',
                 params: [
