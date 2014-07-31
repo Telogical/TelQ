@@ -89,7 +89,7 @@ function dbSql(q) {
         if (!options.source) {
             return new q.Promise(noServerError);
         }
-        if (options.query_type == 'storedProcedure') {
+        if (options.queryType == 'storedProcedure') {
             return new q.Promise(qExecuteStoredProcedure);
         }
         else {
