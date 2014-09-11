@@ -102,9 +102,9 @@ function TelQ() {
         };
     }
 
-    function use(plugin) {
+    function use(plugin, options) {
         if (plugin && plugin instanceof Function) {
-            return plugin(q);
+            return plugin(q, options);
         }
 
         throw 'Must provide TelQ plugin as instance of Function';
