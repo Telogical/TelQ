@@ -9,6 +9,9 @@
     "tedious": "*",
     "lodash": "*"
   },
+  "browser":{
+	  "request": "browser-request"
+  },
   "devDependencies": {
     "chai": "1.9.0",
     "chai-as-promised": "4.1.1",
