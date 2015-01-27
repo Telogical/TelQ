@@ -1,5 +1,5 @@
 {
-  "name": "TelQ",
+  "name": "@telogical/telq",
   "version": "1.0.1",
   "main": "src/TelQ.js",
   "dependencies": {
