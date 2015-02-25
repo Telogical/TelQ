@@ -9,7 +9,9 @@ gulp.task('test', function (cb) {
     .pipe(istanbul()) // Covering files
     .on('finish', function () {
       gulp.src(['test/*.js'])
-        .pipe(mocha())
+        .pipe(mocha({
+           'reporter': 'nyan'
+        }))
         .pipe(istanbul.writeReports()) // Creating the reports after tests runned
         .on('end', cb);
     });
