@@ -8,7 +8,7 @@ gulp.task('test', function (cb) {
   gulp.src(['src/**/*.js', 'dbMongoose/*.js' , 'dbSql/*.js'])
     .pipe(istanbul()) // Covering files
     .on('finish', function () {
-      gulp.src(['test/*.js'])
+      gulp.src(['test/**/*.js'])
         .pipe(mocha({
            'reporter': 'nyan'
         }))
