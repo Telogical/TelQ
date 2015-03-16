@@ -11,85 +11,84 @@ var telQCachingEnabled = true;
 function TelQ() {
   'use strict';
 
+
   function get(options) {
 
-    function qGetHttp(resolve, reject) {
-      options.expires = (options.expires || 0) * cacheTime;
+    var getDfd = RSVP.defer();
 
-      var sanitizedOptions = checkRequiredInputs(options);
+    options.expires = (options.expires || 0) * cacheTime;
 
-      if (!sanitizedOptions.url) {
-        reject(new Error('No url or source provided.'));
-      }
+    var sanitizedOptions = checkRequiredInputs(options);
 
-      var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
-        url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
-
-      function requestCallback(error, response, body) {
-        if (!error && response.statusCode === 200) {
-
-          var result = typeof body === 'string' ? JSON.parse(body) : body;
-
-          if (telQCachingEnabled && options.expires > 0) {
-            cache.add({
-              id: url,
-              value: [result, response],
-              expires: new Date(new Date().getTime() + options.expires)
-            });
-          }
-
-          resolve(result, response);
-        } else {
-          reject(error);
-        }
-      }
-
-      function returnIfCached(cachedItem) {
-        if (cachedItem.id === url) {
-          resolve(cachedItem.value[0], cachedItem.value[1]);
-        }
-      }
-
-      //memoize short circuit.
-      if (telQCachingEnabled) {
-        _.each(cache.list(), returnIfCached);
-      }
-
-      request(url, requestCallback);
+    if (!sanitizedOptions.url) {
+      getDfd.reject(new Error('No url or source provided.'));
     }
 
-    return new RSVP.Promise(qGetHttp);
+    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+    function requestCallback(error, response, body) {
+      if (!error && response.statusCode === 200) {
+
+        var result = typeof body === 'string' ? JSON.parse(body) : body;
+
+        if (telQCachingEnabled && options.expires > 0) {
+          cache.add({
+            id: url,
+            value: [result, response],
+            expires: new Date(new Date().getTime() + options.expires)
+          });
+        }
+
+        getDfd.resolve(result, response);
+      } else {
+        getDfd.reject(error);
+      }
+    }
+
+    function returnIfCached(cachedItem) {
+      if (cachedItem.id === url) {
+        getDfd.resolve(cachedItem.value[0], cachedItem.value[1]);
+      }
+    }
+
+    //memoize short circuit.
+    if (telQCachingEnabled) {
+      _.each(cache.list(), returnIfCached);
+    }
+
+    request(url, requestCallback);
+
+    return getDfd.promise;
   }
 
   function post(options) {
 
-    function qGetHttp(resolve, reject) {
+    var postDfd = RSVP.defer();
 
-      var sanitizedOptions = checkRequiredInputs(options);
+    var sanitizedOptions = checkRequiredInputs(options);
 
-      if (!sanitizedOptions.url) {
-        reject(new Error('No url or source provided.'));
-      }
-
-      var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
-        url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
-
-      options.url = sanitizedOptions.url;
-      options.params = sanitizedOptions.params;
-
-      function requestCallback(error, response, body) {
-        if (!error && response.statusCode === 200) {
-          resolve(body, response);
-        } else {
-          reject(error);
-        }
-      }
-
-      request.post(options, requestCallback);
-
+    if (!sanitizedOptions.url) {
+      postDfd.reject(new Error('No url or source provided.'));
     }
 
-    return new RSVP.Promise(qGetHttp);
+    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+    options.url = sanitizedOptions.url;
+    options.params = sanitizedOptions.params;
+
+    function requestCallback(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        postDfd.resolve(body, response);
+      } else {
+        postDfd.reject(error);
+      }
+    }
+
+    request.post(options, requestCallback);
+
+    return postDfd.promise;
   }
 
   function checkRequiredInputs(options) {
