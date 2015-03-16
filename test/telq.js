@@ -53,13 +53,18 @@ describe('Given I want to make an asynchronous request for a resource', function
 
             describe('When I submit a GET request to the resource', function () {
 
-                it('Then I should receive data from the resource', function (done) {
+                it('Then I should receive data from the resource rabbits', function (done) {
                     var options = {
                         source: server + resource
                     };
+                    
+                    var expectedResult = {
+                      'datum': 'some data'
+                    };
+
                     var qUrl = q.get(options);
 
-                    expect(qUrl).to.eventually.deep.equal(result).and.notify(done);
+                    expect(qUrl).to.eventually.deep.equal(expectedResult).and.notify(done);
                 });
 
             });
