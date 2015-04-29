@@ -1,13 +1,13 @@
 {
   "name": "@telogical/telq",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "src/TelQ.js",
   "dependencies": {
-    "request": "*",
-    "rsvp": "*",
-    "querystring": "*",
-    "tedious": "*",
-    "lodash": "*"
+    "request": "2.54.x",
+    "rsvp": "3.0.x",
+    "querystring": "0.2.x",
+    "tedious": "1.11.x",
+    "lodash": "3.7.x"
   },
   "browser": {
     "request": "browser-request"
