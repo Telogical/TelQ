@@ -1,9 +1,8 @@
-'use strict';
-
 var tedious = require('tedious');
 var _ = require('lodash');
 
 function dbSql(q) {
+    'use strict';
 
     function qDbSql(options) {
 
@@ -27,7 +26,7 @@ function dbSql(q) {
 
                 var request = new tedious.Request(options.query, requestCallback);
 
-                _.each(options.params, function (param) {
+                _.each(options.params, function(param) {
                     request.addParameter(param.name, param.type, param.value);
                 });
 
@@ -36,7 +35,7 @@ function dbSql(q) {
                 }
 
                 request.on('row', onRow);
-                request.on('done', function () {
+                request.on('done', function() {
                     connection.close();
                 });
 
@@ -62,7 +61,7 @@ function dbSql(q) {
 
             function onRow(columns) {
                 var data = {};
-                _.each(columns, function (column) {
+                _.each(columns, function(column) {
                     data[column.metadata.colName] = column.value;
                 });
                 results.push(data);
@@ -91,8 +90,7 @@ function dbSql(q) {
         }
         if (options.queryType == 'storedProcedure') {
             return new q.Promise(qExecuteStoredProcedure);
-        }
-        else {
+        } else {
             return new q.Promise(qExecuteStatement);
         }
 
