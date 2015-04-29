@@ -64,7 +64,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
                     var qUrl = q.get(options);
 
-                    expect(qUrl).to.eventually.deep.equal(expectedResult).and.notify(done);
+                    expect(qUrl).to.eventually.deep.equal('THIS SHOULD FAIL').and.notify(done);
                 });
 
             });
