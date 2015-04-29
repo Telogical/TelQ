@@ -1,0 +1,18 @@
+namespace :build do
+  task :production do
+    build
+  end
+  
+  task :stability do
+    build
+  end
+
+  private
+
+  def build
+    sh "bundle install"
+    sh "npm install"
+    sh "gulp ci"
+  end
+
+end
