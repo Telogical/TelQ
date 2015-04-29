@@ -4,7 +4,6 @@ var _ = require('lodash');
 var qs = require('querystring');
 var reOrder = require('./../lib/reOrder.js');
 var cache = require('./q-cache');
-var tedious = require('tedious');
 
 var cacheTime = (60 * 1000); //cache specified in minutes
 var telQCachingEnabled = true;
@@ -12,139 +11,111 @@ var telQCachingEnabled = true;
 function TelQ() {
   'use strict';
 
-  function get(url, options) {
+
+  function get(options) {
+
+    var getDfd = RSVP.defer();
+
     options.expires = (options.expires || 0) * cacheTime;
 
-    function qGetHttp(resolve, reject) {
+    var sanitizedOptions = checkRequiredInputs(options);
 
-      function requestCallback(error, response, body) {
-        if (!error && response.statusCode === 200) {
-          var result = typeof body === 'string' ? JSON.parse(body) : body;
-
-          if (telQCachingEnabled && options.expires > 0) {
-            cache.add({
-              id: url,
-              value: [result, response],
-              expires: new Date(new Date().getTime() + options.expires)
-            });
-          }
-
-          resolve(result, response);
-        } else {
-          reject(error);
-        }
-      }
-
-      function returnIfCached(cachedItem) {
-        if (cachedItem.id === url) {
-          resolve(cachedItem.value[0], cachedItem.value[1]);
-        }
-      }
-
-
-      options.params = options.params ? reOrder(options.params) : null;
-
-      url = (options.params) ?
-        url + '?' + qs.stringify(options.params) :
-        url;
-
-      //memoize short circuit.
-      if (telQCachingEnabled) {
-        _.each(cache.list(), returnIfCached);
-      }
-
-      request(url, requestCallback);
+    if (!sanitizedOptions.url) {
+      getDfd.reject(new Error('No url or source provided.'));
     }
 
-    return new RSVP.Promise(qGetHttp);
+    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+    function requestCallback(error, response, body) {
+      if (!error && response.statusCode === 200) {
+
+        var result = typeof body === 'string' ? JSON.parse(body) : body;
+
+        if (telQCachingEnabled && options.expires > 0) {
+          cache.add({
+            id: url,
+            value: [result, response],
+            expires: new Date(new Date().getTime() + options.expires)
+          });
+        }
+
+        getDfd.resolve(result, response);
+      } else {
+        getDfd.reject(error);
+      }
+    }
+
+    function returnIfCached(cachedItem) {
+      if (cachedItem.id === url) {
+        getDfd.resolve(cachedItem.value[0], cachedItem.value[1]);
+      }
+    }
+
+    //memoize short circuit.
+    if (telQCachingEnabled) {
+      _.each(cache.list(), returnIfCached);
+    }
+
+    request(url, requestCallback);
+
+    return getDfd.promise;
   }
 
   function post(options) {
-    function qGetHttp(resolve, reject) {
-      function requestCallback(error, response, body) {
-        if (!error && response.statusCode === 200) {
-          resolve(body, response);
-        } else {
-          reject(error);
-        }
-      }
-      request.post(options, requestCallback);
 
+    var postDfd = RSVP.defer();
+
+    var sanitizedOptions = checkRequiredInputs(options);
+
+    if (!sanitizedOptions.url) {
+      postDfd.reject(new Error('No url or source provided.'));
     }
-    return new RSVP.Promise(qGetHttp);
+
+    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+    options.url = sanitizedOptions.url;
+    options.params = sanitizedOptions.params;
+
+    function requestCallback(error, response, body) {
+      if (!error && response.statusCode === 200) {
+        postDfd.resolve(body, response);
+      } else {
+        postDfd.reject(error);
+      }
+    }
+
+    request.post(options, requestCallback);
+
+    return postDfd.promise;
   }
 
-  function dbMongoose(options) {
-    var operation = options.operation || 'find';
-    var query = options.query || {};
-    var model = options.database;
+  function checkRequiredInputs(options) {
+    var _url = options.url || options.source,
+      _params = options.params || options.query;
 
-    function qGetDB(resolve, reject) {
-      if (!model) {
-        reject('no model');
-      }
-
-      function dbCallback(err, data) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      }
-      model[operation](query, dbCallback);
-    }
-    return new RSVP.Promise(qGetDB);
+    return {
+      url: _url,
+      params: _params
+    };
   }
 
-  function dbSql(options) {
-
-
-
-    function qExecuteStatement(resolve, reject) {
-      var connection = new tedious.Connection(options.sqlServer);
-
-      //            connection.on('debug', function(text) {
-      //                // If no error, then good to go...
-      //                console.log('Debug: ' + text);
-      //            });
-
-      connection.on('connect', function(err) {
-
-        if (err) {
-          reject('Error connecting: ' + err);
-        }
-
-        var requestSql = new tedious.Request(options.query, function(err, rowCount) {
-          if (err) {
-            connection.close();
-            reject('Error with sql execution');
-          }
-
-          connection.close();
-          resolve('Statement executed successfully');
-        });
-
-        connection.execSql(requestSql);
-      })
+  function use(plugin, options) {
+    if (plugin && plugin instanceof Function) {
+      return plugin(q, options);
     }
 
-    if (options.sqlServer) {
-      return new RSVP.Promise(qExecuteStatement);
-    } else {
-      return new RSVP.Promise(function(resolve, reject) {
-        reject('No server supplied');
-      });
-    }
+    throw 'Must provide TelQ plugin as instance of Function';
   }
 
-  var q = _.extend(this, RSVP);
+  var q = _.assign(this, RSVP);
 
   //RSVP.configure('onerror', function(reason){ console.assert(false,reason)}); //Error handling?
 
+  q.use = use;
   q.post = post;
   q.get = get;
-  q.dbMongoose = dbMongoose;
-  q.dbSql = dbSql;
   return q;
 }
 
