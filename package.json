@@ -3,29 +3,27 @@
   "version": "1.0.2",
   "main": "src/TelQ.js",
   "dependencies": {
-    "request": "2.54.x",
-    "rsvp": "3.0.x",
-    "querystring": "0.2.x",
-    "tedious": "1.11.x",
-    "lodash": "3.7.x"
+    "browser-request": "0.x.x",
+    "lodash": "3.x.x",
+    "querystring": "0.x.x",
+    "request": "2.x.x",
+    "rsvp": "3.x.x",
+    "tedious": "1.x.x"
   },
   "browser": {
     "request": "browser-request"
   },
   "devDependencies": {
-    "chai": "1.9.0",
-    "chai-as-promised": "4.1.x",
-    "gulp": "3.6.x",
-    "gulp-istanbul": "0.2.x",
-    "gulp-mocha": "0.4.x",
-    "istanbul": "0.1.43",
-    "matchdep": "0.1.2",
-    "mocha": "1.17.1",
-    "mocha-teamcity-reporter": "0.0.2",
-    "mongoose": "3.8.8",
-    "nock": "0.28.3",
-    "sinon": "1.9.0",
-    "sinon-chai": "2.5.0",
-    "tap": "0.4.8"
+    "chai": "2.x.x",
+    "chai-as-promised": "5.x.x",
+    "gulp": "3.x.x",
+    "gulp-istanbul": "0.x.x",
+    "gulp-mocha": "2.x.x",
+    "plato": "*",
+    "gulp-task-listing": "1.x.x",
+    "mongoose": "4.x.x",
+    "nock": "1.x.x",
+    "run-sequence": "1.x.x",
+    "sinon": "1.x.x"
   }
 }

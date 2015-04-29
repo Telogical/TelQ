@@ -1,6 +1,5 @@
-'use strict';
-
 function dbMongoose(q) {
+    'use strict';
 
     function qDbMongoose(options) {
 
@@ -22,7 +21,11 @@ function dbMongoose(q) {
                 }
             }
 
-            conditions ? model[operation](conditions, query, dbCallback) : model[operation](query, dbCallback);
+            if (conditions) {
+                model[operation](conditions, query, dbCallback);
+            } else {
+                model[operation](query, dbCallback);
+            }
         }
 
         return new q.Promise(qGetDB);
