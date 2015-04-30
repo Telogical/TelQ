@@ -125,7 +125,7 @@ describe('Given I want to make an asynchronous request for a resource', function
 
 describe('Given I want to make an asynchronous request for a sql resource', function() {
   var sqlServerDatabase, databaseName, options, ruleId, ruleLocations, featureLineId, promise,
-  fakeConnection, fakeRequest, results;
+  fakeConnection, fakeRequest;
 
   describe('And I successfully connect to a sql data source', function() {
 
@@ -182,18 +182,13 @@ describe('Given I want to make an asynchronous request for a sql resource', func
 
           fakeRequest = function(sql, requestCallback) {
             return {
-              addParameter: function() {
-
-              },
+              addParameter: function() {},
               on: function(state, cb) {
                 if (state === 'row') {
-                  cb([{
-                    value: true
-                  }, {}]);
+                  cb([{value: true}, {}]);
                 } else if (state === 'done') {
                   requestCallback(null, 3);
                 }
-
               }
             };
           };
@@ -212,12 +207,7 @@ describe('Given I want to make an asynchronous request for a sql resource', func
           });
 
           it('Should return the expected data', function(done) {
-
-            results = [
-              [{
-                value: true
-              }, {}]
-            ];
+            var results = [[{value: true}, {}]];
 
             expect(promise).to.eventually.deep.equal(results).notify(done);
           });
@@ -230,22 +220,16 @@ describe('Given I want to make an asynchronous request for a sql resource', func
 
           fakeRequest = function(sql, requestCallback) {
             return {
-              addParameter: function() {
-
-              },
+              addParameter: function() {},
               on: function(state, cb) {
                 if (state === 'row') {
-                  cb([{
-                    value: true
-                  }, {}]);
+                  cb([{value: true}, {}]);
                 } else if (state === 'done') {
                   requestCallback('request error', 0);
                 }
-
               }
             };
           };
-
 
           sinon.stub(tedious, 'Request', fakeRequest);
         });
@@ -261,15 +245,12 @@ describe('Given I want to make an asynchronous request for a sql resource', func
           });
 
           it('Should return a sql execution error', function(done) {
+            var error = 'Error with sql execution: request error';
 
-            results = 'Error with sql execution: request error';
-
-            expect(promise).to.be.rejectedWith('Error with sql execution: request error').notify(done);
+            expect(promise).to.be.rejectedWith(error).notify(done);
           });
         }); //When I call the dbSql function
       }); //And the stored procedure returns unsuccessfully
-
-
     }); //And I want to call a stored procedure with a set of parameters
   }); //And I successfully connect to a sql data source
 
@@ -330,9 +311,6 @@ describe('Given I want to make an asynchronous request for a sql resource', func
       });
     });
   });
-
-
-
 }); //Given I want to make an asynchronous request for a sql resource
 
 
