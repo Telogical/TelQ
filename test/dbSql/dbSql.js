@@ -123,238 +123,221 @@ describe('Given I want to make an asynchronous request for a resource', function
     });
 });
 
-describe('Given a TelQ with db Sql Resource', function() {
-    var sqlServerDatabase, databaseName, TYPES, options, ruleId, ruleLocations, featureLineId, promise,
-        fakeConnection, fakeRequest, results;
+describe('Given I want to make an asynchronous request for a sql resource', function() {
+  var sqlServerDatabase, databaseName, options, ruleId, ruleLocations, featureLineId, promise,
+  fakeConnection, fakeRequest, results;
+
+  describe('And I successfully connect to a sql data source', function() {
 
     beforeEach(function() {
-        sqlServerDatabase = 'database';
-        databaseName = 'databaseName';
-        ruleId = 'ruleId';
-        ruleLocations = [];
-        featureLineId = 'featureLineId';
+      sqlServerDatabase = 'database';
+      databaseName = 'databaseName';
+      ruleId = 'ruleId';
+      ruleLocations = [];
+      featureLineId = 'featureLineId';
 
-        results = [
-            [{
+      fakeConnection = function() {
+        return {
+          execSql: function() {},
+          callProcedure: function() {},
+          close: function() {},
+          on: function(state, cb) {
+            cb();
+          }
+        };
+      };
+
+      sinon.stub(tedious, 'Connection', fakeConnection);
+    });
+
+    afterEach(function() {
+      tedious.Connection.restore();
+    });
+
+    describe('And I want to call a stored procedure with a set of parameters', function() {
+      beforeEach(function() {
+        options = {
+          queryType: 'storedProcedure',
+          source: sqlServerDatabase,
+          query: databaseName + '.Rules.InsertIntoRulesTables',
+          params: [{
+            name: 'RuleId',
+            type: tedious.TYPES.VarChar,
+            value: ruleId
+          }, {
+            name: 'RuleLocations',
+            type: tedious.TYPES.VarChar,
+            value: ruleLocations
+          }, {
+            name: 'FeatureLineupId',
+            type: tedious.TYPES.Int,
+            value: featureLineId
+          }]
+        };
+      });
+
+      describe('And the stored procedure returns successfully', function() {
+
+        beforeEach(function() {
+
+          fakeRequest = function(sql, requestCallback) {
+            return {
+              addParameter: function() {
+
+              },
+              on: function(state, cb) {
+                if (state === 'row') {
+                  cb([{
+                    value: true
+                  }, {}]);
+                } else if (state === 'done') {
+                  requestCallback(null, 3);
+                }
+
+              }
+            };
+          };
+
+          sinon.stub(tedious, 'Request', fakeRequest);
+        });
+
+        afterEach(function() {
+          tedious.Request.restore();
+        });
+
+        describe('When I call the dbSql function', function() {
+
+          beforeEach(function() {
+            promise = q.dbSql(options);
+          });
+
+          it('Should return the expected data', function(done) {
+
+            results = [
+              [{
                 value: true
-            }, {}]
-        ];
+              }, {}]
+            ];
 
-        fakeConnection = function() {
-            return {
-                execSql: function() {},
-                callProcedure: function() {},
-                close: function() {},
-                on: function(state, cb) {
-                    cb();
-                }
-            };
-        };
+            expect(promise).to.eventually.deep.equal(results).notify(done);
+          });
+        }); //When I call the dbSql function
+      }); //And the stored procedure returns successfully
 
-        fakeRequest = function(sql, requestCallback) {
-            return {
-                addParameter: function() {
+      describe('And the stored procedure returns unsuccessfully', function() {
 
-                },
-                on: function(state, cb) {
-                    if (state === 'row') {
-                        cb([{
-                            value: true
-                        }, {}]);
-                    } else if (state === 'done') {
-                        requestCallback(null, 3);
-                    }
-
-                }
-            };
-        };
-        sinon.stub(tedious, 'Connection', fakeConnection);
-        sinon.stub(tedious, 'Request', fakeRequest);
-    });
-
-    afterEach(function() {
-        tedious.Connection.restore();
-        tedious.Request.restore();
-    });
-
-    describe('When I call storedProcedure with set of parameters', function() {
         beforeEach(function() {
-            TYPES = tedious.TYPES;
-            options = {
-                queryType: 'storedProcedure',
-                source: sqlServerDatabase,
-                query: databaseName + '.Rules.InsertIntoRulesTables',
-                params: [{
-                    name: 'RuleId',
-                    type: TYPES.VarChar,
-                    value: ruleId
-                }, {
-                    name: 'RuleLocations',
-                    type: TYPES.VarChar,
-                    value: ruleLocations
-                }, {
-                    name: 'FeatureLineupId',
-                    type: TYPES.Int,
-                    value: featureLineId
-                }]
-            };
-            promise = q.dbSql(options);
-        });
 
-        describe('and request is successful', function() {
-            it('should return the expected data', function(done) {
-                expect(promise).to.eventually.deep.equal([
-                    [{
-                        value: true
-                    }, {}]
-                ]).notify(done);
-            });
-        });
-    });
-});
-
-describe('Given a TelQ with db Sql Resource', function() {
-    var sqlServerDatabase, databaseName, TYPES, options, ruleId, ruleLocations, featureLineId, promise,
-        fakeConnection, fakeRequest, results;
-    beforeEach(function() {
-        sqlServerDatabase = 'database';
-        databaseName = 'databaseName';
-        ruleId = 'ruleId';
-        ruleLocations = [];
-        featureLineId = 'featureLineId';
-
-        results = [
-            [{
-                value: true
-            }, {}]
-        ];
-        fakeConnection = function() {
+          fakeRequest = function(sql, requestCallback) {
             return {
-                execSql: function() {},
-                callProcedure: function() {},
-                close: function() {},
-                on: function(state, cb) {
-                    cb();
+              addParameter: function() {
+
+              },
+              on: function(state, cb) {
+                if (state === 'row') {
+                  cb([{
+                    value: true
+                  }, {}]);
+                } else if (state === 'done') {
+                  requestCallback('request error', 0);
                 }
+
+              }
             };
-        };
+          };
 
-        fakeRequest = function(sql, requestCallback) {
-            return {
-                addParameter: function() {
 
-                },
-                on: function(state, cb) {
-                    if (state === 'row') {
-                        cb([{
-                            value: true
-                        }, {}]);
-                    } else if (state === 'done') {
-                        requestCallback('request error', 0);
-                    }
+          sinon.stub(tedious, 'Request', fakeRequest);
+        });
 
-                }
-            };
-        };
-        sinon.stub(tedious, 'Connection', fakeConnection);
-        sinon.stub(tedious, 'Request', fakeRequest);
-    });
+        afterEach(function() {
+          tedious.Request.restore();
+        });
 
-    afterEach(function() {
-        tedious.Connection.restore();
-        tedious.Request.restore();
-    });
+        describe('When I call the dbSql function', function() {
 
-    describe('When I call storedProcedure with set of parameters', function() {
-        beforeEach(function() {
-            TYPES = tedious.TYPES;
-            options = {
-                queryType: 'storedProcedure',
-                source: sqlServerDatabase,
-                query: databaseName + '.Rules.InsertIntoRulesTables',
-                params: [{
-                    name: 'RuleId',
-                    type: TYPES.VarChar,
-                    value: ruleId
-                }, {
-                    name: 'RuleLocations',
-                    type: TYPES.VarChar,
-                    value: ruleLocations
-                }, {
-                    name: 'FeatureLineupId',
-                    type: TYPES.Int,
-                    value: featureLineId
-                }]
-            };
+          beforeEach(function() {
             promise = q.dbSql(options);
-        });
+          });
 
-        describe('and connection is successful but request errors out', function() {
-            it('should return an sql execution error', function(done) {
-                expect(promise).to.be.rejectedWith('Error with sql execution: request error').notify(done);
-            });
-        });
-    });
-});
+          it('Should return a sql execution error', function(done) {
 
-describe('Given a TelQ with db Sql Resource', function() {
-    var sqlServerDatabase, databaseName, TYPES, options, ruleId, ruleLocations, featureLineId, promise,
-        fakeConnection;
+            results = 'Error with sql execution: request error';
+
+            expect(promise).to.be.rejectedWith('Error with sql execution: request error').notify(done);
+          });
+        }); //When I call the dbSql function
+      }); //And the stored procedure returns unsuccessfully
+
+
+    }); //And I want to call a stored procedure with a set of parameters
+  }); //And I successfully connect to a sql data source
+
+  describe('And I unsuccessfully connect to a sql data source', function() {
 
     beforeEach(function() {
-        sqlServerDatabase = 'database';
-        databaseName = 'databaseName';
-        ruleId = 'ruleId';
-        ruleLocations = [];
-        featureLineId = 'featureLineId';
-
-        fakeConnection = function() {
-            return {
-                execSql: function() {},
-                callProcedure: function() {},
-                close: function() {},
-                on: function(state, cb) {
-                    cb('connection error');
-                }
-            };
+      fakeConnection = function() {
+        return {
+          execSql: function() {},
+          callProcedure: function() {},
+          close: function() {},
+          on: function(state, cb) {
+            cb('connection error');
+          }
         };
-        sinon.stub(tedious, 'Connection', fakeConnection);
+      };
 
-
+      sinon.stub(tedious, 'Connection', fakeConnection);
     });
 
     afterEach(function() {
-        tedious.Connection.restore();
+      tedious.Connection.restore();
     });
 
-    describe('When I call storedProcedure with set of parameters', function() {
+    describe('And I call a stored procedure with a set of parameters', function() {
+
+      beforeEach(function() {
+        options = {
+          queryType: 'storedProcedure',
+          source: sqlServerDatabase,
+          query: databaseName + '.Rules.InsertIntoRulesTables',
+          params: [{
+            name: 'RuleId',
+            type: tedious.TYPES.VarChar,
+            value: ruleId
+          }, {
+            name: 'RuleLocations',
+            type: tedious.TYPES.VarChar,
+            value: ruleLocations
+          }, {
+            name: 'FeatureLineupId',
+            type: tedious.TYPES.Int,
+            value: featureLineId
+          }]
+        };
+      });
+
+      describe('When I call the dbSql function', function() {
+
         beforeEach(function() {
-            TYPES = tedious.TYPES;
-            options = {
-                queryType: 'storedProcedure',
-                source: sqlServerDatabase,
-                query: databaseName + '.Rules.InsertIntoRulesTables',
-                params: [{
-                    name: 'RuleId',
-                    type: TYPES.VarChar,
-                    value: ruleId
-                }, {
-                    name: 'RuleLocations',
-                    type: TYPES.VarChar,
-                    value: ruleLocations
-                }, {
-                    name: 'FeatureLineupId',
-                    type: TYPES.Int,
-                    value: featureLineId
-                }]
-            };
-            promise = q.dbSql(options);
+          promise = q.dbSql(options);
         });
 
-        describe('When connection is unsuccessful', function() {
-            it('should return an connecting error', function(done) {
-                expect(promise).to.be.rejectedWith('Error connecting: connection error').notify(done);
-            });
+        it('Should return a connection error', function(done) {
+          var error = 'Error connecting: connection error';
+          expect(promise).to.be.rejectedWith(error).notify(done);
         });
+      });
     });
-});
+  });
+
+
+
+}); //Given I want to make an asynchronous request for a sql resource
+
+
+
+
+
+
+
