@@ -27,105 +27,28 @@ describe('Given I want to use TelQ', function() {
     });
 });
 
-describe('Given I want to make an asynchronous request for a resource', function() {
-
-    describe('And that resource is a sql server database', function() {
-
-        var fakeConnection = function() {
-            return {
-                execSql: function() {},
-                close: function() {},
-                on: function(state, cb) {
-                    cb();
-                }
-            };
-        };
-
-        describe('And I do not supply a valid server', function() {
-
-            var result = 'No server supplied';
-
-            describe('When I request the resource', function() {
-
-                it('Then I should receive an error', function(done) {
-                    var opts = {};
-                    var qSql = q.dbSql(opts);
-
-                    expect(qSql).to.eventually.be.rejectedWith(result).and.notify(done);
-                });
-            });
-        });
-
-        describe('And the resource returns without an error', function() {
-
-            var result = [];
-
-            var fakeRequest = function(sql, callback) {
-                callback(false, '');
-            };
-
-            beforeEach(function() {
-                sinon.stub(tedious, 'Connection', fakeConnection);
-                sinon.stub(tedious, 'Request', fakeRequest);
-            });
-
-            afterEach(function() {
-                tedious.Connection.restore();
-                tedious.Request.restore();
-            });
-
-            describe('When I request the resource', function() {
-
-                it('Then it should receive data from the resource', function(done) {
-                    var opts = {
-                        source: 'local',
-                        query: 'SELECT * FROM USERS'
-                    };
-                    var qSql = q.dbSql(opts);
-
-                    expect(qSql).to.eventually.deep.equal(result).and.notify(done);
-                });
-            });
-        });
-
-
-        describe('And the resource returns with an error', function() {
-
-            var result = 'Error with sql execution';
-
-            var fakeRequest = function(sql, callback) {
-                callback(true, '');
-            };
-
-            beforeEach(function() {
-                sinon.stub(tedious, 'Connection', fakeConnection);
-                sinon.stub(tedious, 'Request', fakeRequest);
-            });
-
-            afterEach(function() {
-                tedious.Connection.restore();
-                tedious.Request.restore();
-            });
-
-            describe('When I request the resource', function() {
-
-                it('Then it should receive an error from the resource', function(done) {
-                    var opts = {
-                        source: 'local',
-                        query: 'SELECT * FROM USERS'
-                    };
-                    var qSql = q.dbSql(opts);
-
-                    expect(qSql).to.eventually.be.rejectedWith(result).and.notify(done);
-                });
-            });
-        });
-    });
-});
-
 describe('Given I want to make an asynchronous request for a sql resource', function() {
   var sqlServerDatabase, databaseName, options, ruleId, ruleLocations, featureLineId, promise,
   fakeConnection, fakeRequest;
+
+  describe('And I do not supply a valid server', function() {
+
+    beforeEach(function() {
+      options = {};
+    });
+
+    describe('When I request the resource', function() {
+
+      beforeEach(function() {
+        promise = q.dbSql(options);
+      });
+
+      it('Should return a connection error', function(done) {
+        var error = 'No server supplied';
+        expect(promise).to.eventually.be.rejectedWith(error).and.notify(done);
+      });
+    });
+  });
 
   describe('And I successfully connect to a sql data source', function() {
 
@@ -153,6 +76,70 @@ describe('Given I want to make an asynchronous request for a sql resource', func
     afterEach(function() {
       tedious.Connection.restore();
     });
+
+    describe('And I want to execute a query', function() {
+      
+      beforeEach(function() {
+        options = {
+          source: 'local',
+          query: 'SELECT * FROM USERS'
+        };
+      });
+
+      describe('And the resource returns successfully', function() {
+
+        beforeEach(function() {
+          fakeRequest = function(sql, callback) {
+            callback(false, '');
+          };
+
+          sinon.stub(tedious, 'Request', fakeRequest);
+        });
+
+        afterEach(function() {
+          tedious.Request.restore();
+        });
+
+        describe('When I call the dbSql function', function() {
+
+          beforeEach(function() {
+            promise = q.dbSql(options);
+          });
+
+          it('Should return the expected data', function(done) {
+            var expectedData = [];
+            expect(promise).to.eventually.deep.equal(expectedData).and.notify(done);
+          });// Should return the expected data
+        }); //When I call the dbSql function
+      }); // And the resource returns successfully
+
+      describe('And the resource returns unsuccessfully', function() {
+
+        beforeEach(function() {
+          fakeRequest = function(sql, callback) {
+            callback(true, '');
+          };
+
+          sinon.stub(tedious, 'Request', fakeRequest);
+        });
+
+        afterEach(function() {
+          tedious.Request.restore();
+        });
+
+        describe('When I call the dbSql function', function() {
+
+          beforeEach(function() {
+            promise = q.dbSql(options);
+          });
+
+          it('Should return a sql execution error', function(done) {
+            var error = 'Error with sql execution';
+            expect(promise).to.eventually.be.rejectedWith(error).and.notify(done);
+          });// Should return a sql execution error
+        }); //When I call the dbSql function
+      }); //And the resource returns unsuccessfully
+    }); //And I want to execute a query
 
     describe('And I want to call a stored procedure with a set of parameters', function() {
       beforeEach(function() {
@@ -207,9 +194,9 @@ describe('Given I want to make an asynchronous request for a sql resource', func
           });
 
           it('Should return the expected data', function(done) {
-            var results = [[{value: true}, {}]];
+            var expectedData = [[{value: true}, {}]];
 
-            expect(promise).to.eventually.deep.equal(results).notify(done);
+            expect(promise).to.eventually.deep.equal(expectedData).notify(done);
           });
         }); //When I call the dbSql function
       }); //And the stored procedure returns successfully
