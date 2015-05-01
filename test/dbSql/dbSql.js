@@ -28,7 +28,7 @@ describe('Given I want to use TelQ', function() {
 });
 
 describe('Given I want to make an asynchronous request for a sql resource', function() {
-  var sqlServerDatabase, databaseName, options, ruleId, ruleLocations, featureLineId, promise,
+  var sqlServerDatabase, databaseName, options, testId, testLocations, testLineId, promise,
   fakeConnection, fakeRequest;
 
   describe('And I do not supply a valid server', function() {
@@ -55,9 +55,9 @@ describe('Given I want to make an asynchronous request for a sql resource', func
     beforeEach(function() {
       sqlServerDatabase = 'database';
       databaseName = 'databaseName';
-      ruleId = 'ruleId';
-      ruleLocations = [];
-      featureLineId = 'featureLineId';
+      testId = 'testId';
+      testLocations = [];
+      testLineId = 'testLineId';
 
       fakeConnection = function() {
         return {
@@ -148,17 +148,17 @@ describe('Given I want to make an asynchronous request for a sql resource', func
           source: sqlServerDatabase,
           query: databaseName + '.Rules.InsertIntoRulesTables',
           params: [{
-            name: 'RuleId',
+            name: 'TestId',
             type: tedious.TYPES.VarChar,
-            value: ruleId
+            value: testId
           }, {
-            name: 'RuleLocations',
+            name: 'TestLocations',
             type: tedious.TYPES.VarChar,
-            value: ruleLocations
+            value: testLocations
           }, {
-            name: 'FeatureLineupId',
+            name: 'TestLineId',
             type: tedious.TYPES.Int,
-            value: featureLineId
+            value: testLineId
           }]
         };
       });
@@ -270,17 +270,17 @@ describe('Given I want to make an asynchronous request for a sql resource', func
           source: sqlServerDatabase,
           query: databaseName + '.Rules.InsertIntoRulesTables',
           params: [{
-            name: 'RuleId',
+            name: 'TestId',
             type: tedious.TYPES.VarChar,
-            value: ruleId
+            value: testId
           }, {
-            name: 'RuleLocations',
+            name: 'TestLocations',
             type: tedious.TYPES.VarChar,
-            value: ruleLocations
+            value: testLocations
           }, {
-            name: 'FeatureLineupId',
+            name: 'RuleLineId',
             type: tedious.TYPES.Int,
-            value: featureLineId
+            value: testLineId
           }]
         };
       });
