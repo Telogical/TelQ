@@ -146,7 +146,7 @@ describe('Given I want to make an asynchronous request for a sql resource', func
         options = {
           queryType: 'storedProcedure',
           source: sqlServerDatabase,
-          query: databaseName + '.Rules.InsertIntoRulesTables',
+          query: databaseName + '.Rules.InsertIntoTestTables',
           params: [{
             name: 'TestId',
             type: tedious.TYPES.VarChar,
@@ -268,7 +268,7 @@ describe('Given I want to make an asynchronous request for a sql resource', func
         options = {
           queryType: 'storedProcedure',
           source: sqlServerDatabase,
-          query: databaseName + '.Rules.InsertIntoRulesTables',
+          query: databaseName + '.Rules.InsertIntoTestTables',
           params: [{
             name: 'TestId',
             type: tedious.TYPES.VarChar,
