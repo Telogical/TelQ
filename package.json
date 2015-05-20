@@ -2,7 +2,9 @@
   "name": "@telogical/telq",
   "version": "1.0.4",
   "main": "src/TelQ.js",
-  "dependencies": {
+	"scripts": {
+    "test": "gulp ci"},
+    "dependencies": {
     "browser-request": "0.x.x",
     "lodash": "3.x.x",
     "querystring": "0.x.x",
