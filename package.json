@@ -1,5 +1,5 @@
 {
-  "name": "@telogical/telq",
+  "name": "telq",
   "version": "1.0.4",
   "main": "src/TelQ.js",
 	"scripts": {
