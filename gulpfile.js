@@ -11,6 +11,7 @@ var jsHintArgs = JSON.parse(fs.readFileSync('./.jshintrc', 'utf8'));
 
 var src = [
     'src/**/*.js',
+    'lib/**/*.js',
     'dbMongoose/*.js',
     'dbSql/*.js'
 ];
