@@ -2,7 +2,6 @@ var request = require('request');
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var qs = require('querystring');
-var reOrder = require('./../lib/reOrder.js');
 var cache = require('./q-cache');
 
 var cacheTime = (60 * 1000); //cache specified in minutes
@@ -24,7 +23,7 @@ function TelQ() {
       getDfd.reject(new Error('No url or source provided.'));
     }
 
-    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
     url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
     function requestCallback(error, response, body) {
@@ -57,7 +56,7 @@ function TelQ() {
       _.each(cache.list(), returnIfCached);
     }
 
-    request(url, requestCallback);
+    request.get(url, requestCallback);
 
     return getDfd.promise;
   }
@@ -72,7 +71,7 @@ function TelQ() {
       postDfd.reject(new Error('No url or source provided.'));
     }
 
-    var params = (sanitizedOptions.params) ? reOrder(sanitizedOptions.params) : null,
+    var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
     url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
     options.url = sanitizedOptions.url;
