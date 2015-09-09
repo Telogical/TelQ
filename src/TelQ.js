@@ -10,7 +10,6 @@ var telQCachingEnabled = true;
 function TelQ() {
   'use strict';
 
-
   function get(options) {
 
     var getDfd = RSVP.defer();
@@ -108,6 +107,12 @@ function TelQ() {
     throw 'Must provide TelQ plugin as instance of Function';
   }
 
+  function when(val) {
+    return new q.Promise(function(resolve){
+      resolve(val);
+    });
+  }
+
   var q = _.assign(this, RSVP);
 
   //RSVP.configure('onerror', function(reason){ console.assert(false,reason)}); //Error handling?
@@ -115,6 +120,7 @@ function TelQ() {
   q.use = use;
   q.post = post;
   q.get = get;
+  q.when = when;
   return q;
 }
 

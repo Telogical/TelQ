@@ -14,14 +14,40 @@ describe('Given I want to use TelQ', function () {
 
     it('Then it should have a get function by default', function (done) {
       var hasGet = _.has(q, 'get');
-      expect(hasGet).to.equal(true);
+      expect(hasGet).to.eql(true);
       done();
     });
 
     it('Then it should have a post function by default', function (done) {
       var hasPost = _.has(q, 'post');
-      expect(hasPost).to.equal(true);
+      expect(hasPost).to.eql(true);
       done();
+    });
+
+    it('Should have a when function by default', function(done) {
+      var hasWhen = _.has(q, 'when');
+      expect(hasWhen).to.eql(true);
+      done();
+    });
+  });
+});
+
+describe('Given I a value that I want to wrap with a promise', function() {
+  var value;
+
+  beforeEach(function() {
+    value = '12345';
+  });
+  
+  describe('When I send it to the when function', function() {
+    var whenValue;
+
+    beforeEach(function() {
+      whenValue = q.when(value);
+    });
+
+    it('Should return the value wrapped in a promise', function(done) {
+      expect(whenValue).to.eventually.eql(value).and.notify(done);
     });
   });
 });
