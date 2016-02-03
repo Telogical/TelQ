@@ -12,19 +12,6 @@ function TelQ() {
 
   function get(options) {
 
-    var getDfd = RSVP.defer();
-
-    options.expires = (options.expires || 0) * cacheTime;
-
-    var sanitizedOptions = checkRequiredInputs(options);
-
-    if (!sanitizedOptions.url) {
-      getDfd.reject(new Error('No url or source provided.'));
-    }
-
-    var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
-    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
-
     function requestCallback(error, response, body) {
       if (!error && response.statusCode === 200) {
 
@@ -40,22 +27,37 @@ function TelQ() {
 
         getDfd.resolve(result, response);
       } else {
-        getDfd.reject({error:error, body:body, statusCode:response.statusCode});
+        getDfd.reject(error);
       }
     }
 
-    function returnIfCached(cachedItem) {
-      if (cachedItem.id === url) {
-        getDfd.resolve(cachedItem.value[0], cachedItem.value[1]);
-      }
+    var getDfd = RSVP.defer();
+
+    options.expires = (options.expires || 0) * cacheTime;
+
+    var sanitizedOptions = checkRequiredInputs(options);
+
+    if (!sanitizedOptions.url) {
+      getDfd.reject(new Error('No url or source provided.'));
     }
 
-    //memoize short circuit.
+    var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
+    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
+
     if (telQCachingEnabled) {
-      _.each(cache.list(), returnIfCached);
-    }
+      var matches = _.filter(cache.list(), function(cachedItem){
+        return cachedItem.id === url;
+      });
 
-    request.get(url, requestCallback);
+      var itemIsInCache = matches.length;
+
+      if(itemIsInCache){
+        getDfd.resolve(matches[0].value[0]);
+      } else {
+        request.get(url, requestCallback);
+      }
+    }
 
     return getDfd.promise;
   }
