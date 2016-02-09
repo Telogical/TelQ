@@ -27,7 +27,7 @@ function TelQ() {
 
         getDfd.resolve(result, response);
       } else {
-        getDfd.reject(error);
+        getDfd.reject({error:error, body:body, statusCode:response.statusCode});
       }
     }
 
