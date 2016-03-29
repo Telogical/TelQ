@@ -45,7 +45,7 @@ function TelQ() {
     var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
       url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
-
+    options.url = url;
 
     if (telQCachingEnabled) {
       var matches = _.filter(cache.list(), function(cachedItem){
@@ -57,7 +57,7 @@ function TelQ() {
       if(itemIsInCache){
         getDfd.resolve(matches[0].value[0]);
       } else {
-        request.get(sanitizedOptions, requestCallback);
+        request.get(options, requestCallback);
       }
     }
 
