@@ -77,8 +77,7 @@ function TelQ() {
     var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
     url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
-    options.url = sanitizedOptions.url;
-    options.params = sanitizedOptions.params;
+    options.url = url;
 
     function requestCallback(error, response, body) {
       if (!error && response.statusCode === 200) {
