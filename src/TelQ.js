@@ -43,7 +43,8 @@ function TelQ() {
     }
 
     var params = (sanitizedOptions.params) ? sanitizedOptions.params : null,
-    url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+      url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
+
 
 
     if (telQCachingEnabled) {
@@ -56,7 +57,7 @@ function TelQ() {
       if(itemIsInCache){
         getDfd.resolve(matches[0].value[0]);
       } else {
-        request.get(url, requestCallback);
+        request.get(sanitizedOptions, requestCallback);
       }
     }
 
@@ -95,6 +96,14 @@ function TelQ() {
   function checkRequiredInputs(options) {
     var _url = options.url || options.source,
       _params = options.params || options.query;
+
+    if (_.has(options, 'encoding')) {
+      return {
+        url: _url,
+        params: _params,
+        encoding: options.encoding
+      };
+    }
 
     return {
       url: _url,

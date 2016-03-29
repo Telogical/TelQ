@@ -38,7 +38,7 @@ describe('Given I a value that I want to wrap with a promise', function() {
   beforeEach(function() {
     value = '12345';
   });
-  
+
   describe('When I send it to the when function', function() {
     var whenValue;
 
@@ -58,6 +58,7 @@ describe('Given I want to make an asynchronous request for a resource', function
     var server = 'http://server';
     var resource = '/resource';
     var qUrl;
+    var getCall;
 
     describe('And the resource returns without an error', function () {
       var result = {
@@ -65,10 +66,10 @@ describe('Given I want to make an asynchronous request for a resource', function
       };
 
       beforeEach(function () {
-        sinon.stub(request, 'get', function(url, callback) {
+        getCall = sinon.stub(request, 'get', function(url, callback) {
           callback(null, {statusCode: 200}, result)
         });
-        
+
         sinon.stub(request, 'post', function(url, callback) {
           callback(null, {statusCode: 200}, result)
         });
@@ -79,6 +80,9 @@ describe('Given I want to make an asynchronous request for a resource', function
         request.post.restore();
       });
 
+      function getEncoding(call) {
+        return getCall.args[0][0].encoding;
+      }
 
       describe('When I submit a GET request to the resource', function () {
 
@@ -98,10 +102,32 @@ describe('Given I want to make an asynchronous request for a resource', function
           expect(qUrl).to.eventually.deep.equal(expectedResult).and.notify(done);
         });
 
+        it('Then it should not have an encoding', function () {
+          expect(getEncoding(getCall)).to.be.undefined;
+        });
+      });
+
+      describe('When I submit a GET request to the resource with a non-default encoding', function () {
+        var encoding = 'Some encoding';
+        var options;
+
+        beforeEach(function() {
+          options = {
+            url: server + resource,
+            params: null,
+            encoding: encoding
+          };
+
+          qUrl = q.get(options);
+        });
+
+        it('Then I should call the resource with the non-default encoding', function () {
+          expect(getEncoding(getCall)).to.eql(options.encoding);
+        });
       });
 
       describe('When I submit a POST to the resource', function () {
-        
+
         beforeEach(function() {
           var options = {
             source: server + resource
@@ -124,7 +150,7 @@ describe('Given I want to make an asynchronous request for a resource', function
         sinon.stub(request, 'get', function(url, callback) {
           callback(true, {statusCode: 404}, result)
         });
-        
+
         sinon.stub(request, 'post', function(url, callback) {
           callback(true, {statusCode: 404}, result)
         });
