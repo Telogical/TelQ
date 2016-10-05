@@ -130,7 +130,11 @@ describe('Given I want to make an asynchronous request for a resource', function
 
         beforeEach(function() {
           var options = {
-            source: server + resource
+            source: server + resource,
+            body: {
+              'foo': 'bar',
+              'thisis': 'formdata_basically'
+            }
           };
 
           qUrl = q.post(options);
