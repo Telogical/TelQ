@@ -78,6 +78,9 @@ function TelQ() {
     url = params ? sanitizedOptions.url + '?' + qs.stringify(params) : sanitizedOptions.url;
 
     options.url = url;
+    if(typeof options.body === 'object' && options.body) {
+      options.json = true;
+    }
 
     function requestCallback(error, response, body) {
       if (!error && response.statusCode === 200) {

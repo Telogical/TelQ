@@ -1,6 +1,6 @@
 {
   "name": "telq",
-  "version": "1.3.1",
+  "version": "1.4.1",
   "repository": "https://github.com/Telogical/TelQ",
   "main": "src/TelQ.js",
 	"scripts": {
