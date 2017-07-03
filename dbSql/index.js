@@ -74,6 +74,11 @@ function dbSql(q) {
                 }
 
                 var request = new tedious.Request(options.query, onRequestError);
+
+                _.each(options.params, function(param) {
+                    request.addParameter(param.name, param.type, param.value);
+                });
+
                 request.on('row', onRow);
                 connection.execSql(request);
             }
