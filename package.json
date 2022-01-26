@@ -1,6 +1,6 @@
 {
   "name": "telq",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "repository": "https://github.com/Telogical/TelQ",
   "main": "src/TelQ.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "querystring": "0.x.x",
     "request": "2.x.x",
     "rsvp": "3.x.x",
-    "tedious": "^14.1.0"
+    "tedious": "1.x.x"
   },
   "browser": {
     "request": "browser-request"
