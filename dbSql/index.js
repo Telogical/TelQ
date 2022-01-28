@@ -5,7 +5,6 @@ function dbSql(q) {
     'use strict';
 
     function qDbSql(options) {
-
         function qExecuteStoredProcedure(resolve, reject) {
             var results = [];
             var connection = new tedious.Connection(options.source);
@@ -47,7 +46,18 @@ function dbSql(q) {
 
         function qExecuteStatement(resolve, reject) {
             var results = [];
-            var connection = new tedious.Connection(options.source);
+            var config = {
+                server: options.source.server,
+                authentication: {
+                  type: 'default',
+                  options: {
+                    userName: options.source.userName,
+                    password: options.source.password
+                  }
+                },
+                options: options.source.options
+              };
+            var connection = new tedious.Connection(config);
 
             function onRequestError(err, rowCount) {
                 if (err) {
@@ -69,10 +79,8 @@ function dbSql(q) {
 
             function onConnection(err) {
                 if (err) {
-                    console.log('Error on connection', err);
                     reject(new Error('Error connecting: ' + err));
                 }
-
                 var request = new tedious.Request(options.query, onRequestError);
 
                 _.each(options.params, function(param) {
@@ -82,8 +90,8 @@ function dbSql(q) {
                 request.on('row', onRow);
                 connection.execSql(request);
             }
-
             connection.on('connect', onConnection);
+            connection.connect();
         }
 
         function noServerError(resolve, reject) {
