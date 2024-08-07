@@ -1,4 +1,4 @@
-var request = require('request');
+var axios = require('axios').default;
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var qs = require('querystring');
@@ -57,7 +57,7 @@ function TelQ() {
       if(itemIsInCache){
         getDfd.resolve(matches[0].value[0]);
       } else {
-        request.get(options, requestCallback);
+        axios.get(options, requestCallback);
       }
     }
 
@@ -82,15 +82,16 @@ function TelQ() {
       options.json = true;
     }
 
-    function requestCallback(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        postDfd.resolve(body, response);
-      } else {
-        postDfd.reject(error);
-      }
+    function handleSuccess(response) {
+      postDfd.resolve(response);
     }
 
-    request.post(options, requestCallback);
+    function handleFailure(error) {
+      console.log('what are options', options)
+      postDfd.reject(error);
+    }
+
+    axios.post(options.url, options.body).then(handleSuccess, handleFailure);
 
     return postDfd.promise;
   }

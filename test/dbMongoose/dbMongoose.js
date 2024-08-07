@@ -50,11 +50,11 @@ describe('Given I want to use TelQ', function () {
               };
 
               beforeEach(function () {
-                  sinon.stub(mongoose.models.Tel, 'find', find);
+                  sinon.stub(mongoose.models.Tel, 'find').callsFake(find);
               });
 
               afterEach(function () {
-                  mongoose.models.Tel.find.restore();
+                  sinon.restore();
               });
 
               describe('When I request the resource', function () {
@@ -79,11 +79,11 @@ describe('Given I want to use TelQ', function () {
               };
 
               beforeEach(function () {
-                  sinon.stub(mongoose.models.Tel, 'find', find);
+                  sinon.stub(mongoose.models.Tel, 'find').callsFake(find);
               });
 
               afterEach(function () {
-                  mongoose.models.Tel.find.restore();
+                  sinon.restore();
               });
 
               describe('When I request the resource', function () {

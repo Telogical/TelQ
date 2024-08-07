@@ -5,9 +5,21 @@ function dbSql(q) {
     'use strict';
 
     function qDbSql(options) {
+        console.log('options', options);
         function qExecuteStoredProcedure(resolve, reject) {
             var results = [];
-            var connection = new tedious.Connection(options.source);
+            var config = {
+                server: 'local',
+                authentication: {
+                  type: 'default',
+                  options: {
+                    userName: options.source.userName,
+                    password: options.source.password
+                  }
+                },
+                options: options.source.options
+              };
+            var connection = new tedious.Connection(config);
 
             function requestCallback(err, rowCount) {
                 if (err) {
@@ -47,7 +59,7 @@ function dbSql(q) {
         function qExecuteStatement(resolve, reject) {
             var results = [];
             var config = {
-                server: options.source.server,
+                server: 'local',
                 authentication: {
                   type: 'default',
                   options: {

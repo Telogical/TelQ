@@ -1,13 +1,12 @@
 'use strict';
 var gulp = require('gulp');
-var fs = require('fs');
+// var {task, } = require('gulp');
+// var fs = import('fs');
+var {readFileSync} = require('fs');
 var istanbul = require('gulp-istanbul');
-var mocha = require('gulp-mocha');
-var plato = require('plato');
-var runSequence = require('run-sequence');
-var taskListing = require('gulp-task-listing');
+var mocha = import('gulp-mocha');
 
-var jsHintArgs = JSON.parse(fs.readFileSync('./.jshintrc', 'utf8'));
+var jsHintArgs = JSON.parse(readFileSync('./.jshintrc', 'utf8'));
 
 var src = [
     'src/**/*.js',
@@ -17,65 +16,45 @@ var src = [
 ];
 
 function test(cb) {
+    var mochaPromise = import('gulp-mocha'); // Use dynamic import for ES modules
 
-    var mochaOpts = {
-        reporter: 'nyan'
-    };
-
-    var istanbulOptions = {
-        includeUntested: true
-    };
-
-    function runner() {
-        gulp
-            .src(['test/**/*.js'])
-            .pipe(mocha(mochaOpts))
-            .pipe(istanbul.writeReports('./artifacts/coverage'))
-
-        .on('end', cb);
-    }
-
-    gulp
-        .src(src)
-        .pipe(istanbul(istanbulOptions))
-        .pipe(istanbul.hookRequire())
-        .on('finish', runner);
-}
-
-
-
-function complexity() {
-
-    var defaultJsHintOpts = {
-            strict: true,
-            curly: true,
-            unused: true,
-            undef: true,
-            node: true
-        },
-        complexityArgs = {
-            trycatch: true,
-            newmi: true
-        },
-        platoArgs = {
-            jshint: jsHintArgs || defaultJsHintOpts,
-            complexity: complexityArgs
+    mochaPromise.then((mocha) => {
+        var mochaOpts = {
+            reporter: 'nyan'
         };
 
-    function callback() {
+        var istanbul = require('gulp-istanbul');
 
-    }
+        var istanbulOptions = {
+            includeUntested: true
+        };
 
-    return plato.inspect(src, 'artifacts/complexity', platoArgs, callback);
+        function runner() {
+            gulp.src(['test/**/*.js'])
+                .pipe(mocha.default(mochaOpts)) // Use mocha.default as a function here
+                .pipe(istanbul.writeReports('./artifacts/coverage'))
+                .on('end', function() {
+                    console.log('Test task has finished successfully.');
+                    cb(); // Call the callback function to indicate task completion
+                });
+        }
+
+        gulp.src(src)
+            .pipe(istanbul(istanbulOptions))
+            .pipe(istanbul.hookRequire())
+            .on('finish', runner);
+    });
 }
+
 
 function ci(cb) {
-    runSequence('test', 'complexity', cb);
+    gulp.series(test, function(done) {
+        console.log('ci task has finished successfully.');
+        done();
+        cb();
+    })();
 }
 
 
-gulp
-    .task('test', test)
-    .task('complexity', complexity)
-    .task('default', taskListing)
-    .task('ci', ci);
+    gulp.task('test', test)
+    gulp.task('ci', ci);

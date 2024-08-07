@@ -2,7 +2,7 @@
 
 var _ = require('lodash');
 var sinon = require('sinon');
-var request = require('request');
+var axios = require('axios');
 var chai = require('chai');
 var chaiAsPromised = require('chai-as-promised');
 chai.use(chaiAsPromised);
@@ -66,18 +66,18 @@ describe('Given I want to make an asynchronous request for a resource', function
       };
 
       beforeEach(function () {
-        getCall = sinon.stub(request, 'get', function(url, callback) {
+        getCall = sinon.stub(axios, 'get').callsFake(function(url, callback) {
           callback(null, {statusCode: 200}, result)
         });
 
-        sinon.stub(request, 'post', function(url, callback) {
+        sinon.stub(axios, 'post').callsFake(function(url, callback) {
           callback(null, {statusCode: 200}, result)
         });
       });
 
       afterEach(function () {
-        request.get.restore();
-        request.post.restore();
+        axios.get.restore();
+        axios.post.restore();
       });
 
       function getEncoding(call) {
@@ -151,18 +151,18 @@ describe('Given I want to make an asynchronous request for a resource', function
       var result = 'some error';
 
       beforeEach(function () {
-        sinon.stub(request, 'get', function(url, callback) {
+        sinon.stub(axios, 'get').callsFake(function(url, callback) {
           callback(true, {statusCode: 404}, result)
         });
 
-        sinon.stub(request, 'post', function(url, callback) {
+        sinon.stub(axios, 'post').callsFake(function(url, callback) {
           callback(true, {statusCode: 404}, result)
         });
       });
 
       afterEach(function () {
-        request.get.restore();
-        request.post.restore();
+        axios.get.restore();
+        axios.post.restore();
       });
 
       describe('When I submit a GET request to the resource', function () {
