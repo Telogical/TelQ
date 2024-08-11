@@ -1,18 +1,18 @@
 {
   "name": "telq",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "repository": "https://github.com/Telogical/TelQ",
   "main": "src/TelQ.js",
   "scripts": {
     "test": "gulp ci"
   },
   "dependencies": {
+    "axios": "^1.6.8",
     "browser-request": "0.x.x",
     "lodash": "3.x.x",
     "querystring": "0.x.x",
-    "request": "2.x.x",
     "rsvp": "3.x.x",
-    "tedious": "14.x.x"
+    "tedious": "18.3.x"
   },
   "browser": {
     "request": "browser-request"
@@ -25,7 +25,6 @@
     "gulp-mocha": "2.x.x",
     "plato": "*",
     "gulp-task-listing": "1.x.x",
-    "mongoose": "4.x.x",
     "nock": "1.x.x",
     "run-sequence": "1.x.x",
     "sinon": "1.x.x"

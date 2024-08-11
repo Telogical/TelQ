@@ -18,9 +18,10 @@ function dbSql(q) {
                 resolve(results);
             }
 
-            function onConnection(err) {
+            connection.on('connect', function(err) {
                 if (err) {
                     reject(new Error('Error connecting: ' + err));
+                    return;
                 }
 
                 var request = new tedious.Request(options.query, requestCallback);
@@ -30,18 +31,22 @@ function dbSql(q) {
                 });
 
                 function onRow(columns) {
-                    results.push(columns);
+                    var row = {};
+                    columns.forEach(column => {
+                        row[column.metadata.colName] = column.value;
+                    });
+                    results.push(row);
                 }
 
                 request.on('row', onRow);
-                request.on('done', function() {
+                request.on('requestCompleted', function() {
                     connection.close();
                 });
 
-                connection.callProcedure(request);
-            }
+                connection.execSql(request);
+            });
 
-            connection.on('connect', onConnection);
+            connection.connect();
         }
 
         function qExecuteStatement(resolve, reject) {
@@ -49,14 +54,17 @@ function dbSql(q) {
             var config = {
                 server: options.source.server,
                 authentication: {
-                  type: 'default',
-                  options: {
-                    userName: options.source.userName,
-                    password: options.source.password
-                  }
+                    type: 'default',
+                    options: {
+                        userName: options.source.userName,
+                        password: options.source.password
+                    }
                 },
-                options: options.source.options
-              };
+                options: {
+                    ...options.source.options,
+                    trustServerCertificate: true
+                }
+            };
             var connection = new tedious.Connection(config);
 
             function onRequestError(err, rowCount) {
@@ -77,9 +85,10 @@ function dbSql(q) {
                 results.push(data);
             }
 
-            function onConnection(err) {
+            connection.on('connect', function(err) {
                 if (err) {
                     reject(new Error('Error connecting: ' + err));
+                    return;
                 }
                 var request = new tedious.Request(options.query, onRequestError);
 
@@ -89,8 +98,8 @@ function dbSql(q) {
 
                 request.on('row', onRow);
                 connection.execSql(request);
-            }
-            connection.on('connect', onConnection);
+            });
+
             connection.connect();
         }
 
