@@ -26,7 +26,7 @@ function dbSql(q) {
 
                 var request = new tedious.Request(options.query, requestCallback);
 
-                _.each(options.params, function(param) {
+                _.forEach(options.params, function(param) {
                     request.addParameter(param.name, param.type, param.value);
                 });
 
@@ -92,7 +92,7 @@ function dbSql(q) {
                 }
                 var request = new tedious.Request(options.query, onRequestError);
 
-                _.each(options.params, function(param) {
+                _.forEach(options.params, function(param) {
                     request.addParameter(param.name, param.type, param.value);
                 });
 

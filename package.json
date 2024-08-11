@@ -9,7 +9,7 @@
   "dependencies": {
     "axios": "^1.6.8",
     "browser-request": "0.x.x",
-    "lodash": "3.x.x",
+    "lodash": ">=4.17.21",
     "querystring": "0.x.x",
     "rsvp": "3.x.x",
     "tedious": "18.3.x"
