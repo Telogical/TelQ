@@ -20,12 +20,6 @@
   "devDependencies": {
     "chai": "2.x.x",
     "chai-as-promised": "5.x.x",
-    "gulp": "3.x.x",
-    "gulp-istanbul": "0.x.x",
-    "gulp-mocha": "2.x.x",
-    "plato": "*",
-    "gulp-task-listing": "1.x.x",
-    "nock": "1.x.x",
     "run-sequence": "1.x.x",
     "sinon": "1.x.x"
   }
