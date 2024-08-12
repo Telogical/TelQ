@@ -17,10 +17,18 @@
   "browser": {
     "request": "browser-request"
   },
+  "resolutions": {
+    "lodash": "4.17.21",
+    "gulp-istanbul/minimatch": "3.0.4"
+  },
   "devDependencies": {
-    "chai": "2.x.x",
-    "chai-as-promised": "5.x.x",
-    "run-sequence": "1.x.x",
+    "chai": "5.x.x",
+    "chai-as-promised": "8.x.x",
+    "gulp": "5.x.x",
+    "gulp-istanbul": "1.x.x",
+    "gulp-mocha": "10.x.x",
+    "gulp-task-listing": "1.x.x",
+    "run-sequence": "2.2.1",
     "sinon": "1.x.x"
   }
 }
