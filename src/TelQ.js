@@ -1,4 +1,4 @@
-var axios = require('axios');
+var axios = require('axios').default;
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var qs = require('querystring');
@@ -11,6 +11,7 @@ function TelQ() {
   'use strict';
 
   function get(options) {
+    console.log('in get')
 
     function requestCallback(error, response, body) {
       if (!error && response.statusCode === 200) {
@@ -82,6 +83,7 @@ function TelQ() {
   }
 
   function post(options) {
+    console.log('in post')
 
     var postDfd = RSVP.defer();
 
@@ -106,7 +108,7 @@ function TelQ() {
         postDfd.reject(error);
       }
     }
-
+console.log('axios post', axios)
     axios.post(options.url, options.body, {
       params: options.params,
       headers: options.headers
