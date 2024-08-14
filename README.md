@@ -50,33 +50,6 @@ All top level (eg it is a resource, such as dbSql, or db Mongoose) plugins input
 
 ```
 
-###DbMongoose
-
-TelQ can also be extended for backend applications to connect to either a mongodb instance or a microsoft sqlserver instance.  The dbMongoose extension wraps [mongoosejs](http://mongoosejs.com).  So for the options.source property you should give an instance of the model you wish to query.  The mongo extenstion also requires the operation you want to execute to be included in the options param.  
-
-```js
-var q = require('telq');
-var dbMongoose = require('telq/dbMongoose');
-
-q.use(dbMongoose);
-
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
-
-var Cat = mongoose.model('Cat', { name: String });
-
-var options = {
-  source: Cat,
-  query: {
-    name: 'Mittens'
-  },
-  operation: 'find'
-};
-
-var qDb = q.dbMongoose(options);
-qDb.then(resolveCallback, rejectCallback);
-```
-
 ###DbSql
 
 The dbSql extension wraps [tedious](https://github.com/pekim/tedious).  The options.source property should be an object with the address of the sql instance you wish to connect to, username, password, and an object with the queried databases.  Also you will include the string query you wish to execute.  If you are executing a read query the data will be passed back through the data parameter of the success callback.

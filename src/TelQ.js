@@ -1,4 +1,4 @@
-var request = require('request');
+var axios = require('axios').default;
 var RSVP = require('rsvp');
 var _ = require('lodash');
 var qs = require('querystring');
@@ -57,7 +57,24 @@ function TelQ() {
       if(itemIsInCache){
         getDfd.resolve(matches[0].value[0]);
       } else {
-        request.get(options, requestCallback);
+        axios.get(options.url, {
+          params: options.params,
+          headers: options.headers
+        })
+          .then(function(response) {
+            var result = response.data;
+            if (telQCachingEnabled && options.expires > 0) {
+              cache.add({
+                id: url,
+                value: [result, response],
+                expires: new Date(new Date().getTime() + options.expires)
+              });
+            }
+            getDfd.resolve(result, response);
+          })
+          .catch(function(error) {
+            getDfd.reject({error: error, body: error.response ? error.response.data : null, statusCode: error.response ? error.response.status : null});
+          });
       }
     }
 
@@ -89,8 +106,16 @@ function TelQ() {
         postDfd.reject(error);
       }
     }
-
-    request.post(options, requestCallback);
+    axios.post(options.url, options.body, {
+      params: options.params,
+      headers: options.headers
+    })
+      .then(function(response) {
+        postDfd.resolve(response.data, response);
+      })
+      .catch(function(error) {
+        postDfd.reject(error);
+      });
 
     return postDfd.promise;
   }

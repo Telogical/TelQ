@@ -17,12 +17,11 @@ function PackageCache() {
             return datum.id !== key;
         }
         
-        registry = _
-            .chain(registry)
-            .uniq(uniqueIds)
-            .filter(cleanOldItems)
-            .filter(currentKey)
-            .value();
+        registry = _.flow([
+            items => _.uniqBy(items, uniqueIds),
+            items => _.filter(items, cleanOldItems),
+            items => _.filter(items, currentKey)
+        ])(registry);
     }
 
     function add(item) {
